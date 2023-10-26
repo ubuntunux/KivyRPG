@@ -6,6 +6,10 @@ from utility.sprite import Sprite
 class Tile(Sprite):
     def __init__(self, **kargs):
         super().__init__(**kargs)
+    
+    def update(self, dt):
+        from KivyRPG.main import KivyRPGApp
+        KivyRPGApp.instance().debug_text.text = str(dt)
 
 
 class TileManager(Widget, SingletonInstance):
@@ -20,4 +24,5 @@ class TileManager(Widget, SingletonInstance):
       self.add_widget(tile)
       
   def update(self, dt):
-      pass
+      for child in self.children:
+          child.update(dt)
