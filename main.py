@@ -31,11 +31,9 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.add_widget(self.tile_manager)
         btn = self.tile_manager.create_tile(
             source="KivyRPG/data/images/tiles_00.png",
-            pos=(200,200), 
-            texture_region=(0,0,512,512), 
-            throwable=True, 
-            gravity=10.0, 
-            collision=True
+            pos=(200,200),
+            size=(500,500)
+            
         )
         
     def update(self, dt):
