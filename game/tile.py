@@ -6,10 +6,10 @@ from utility.singleton import SingletonInstance
 
 
 class Tile(Scatter):
-    def __init__(self, source, pos, size):
+    def __init__(self, source, pos, size, texture_region):
         super().__init__(pos=pos, size=size)
         image = Image(source=source, size=size, keep_ratio=False, allow_stretch=True)
-        image.texture = image.texture.get_region(0,0,64,64)
+        image.texture = image.texture.get_region(*texture_region)
         self.add_widget(image)
     
     def update(self, dt):
@@ -24,8 +24,8 @@ class TileManager(Widget, SingletonInstance):
   def reset_tiles(self):
     self.clear_widgets()
     
-  def create_tile(self, source, pos, size):
-      tile = Tile(source, pos, size)
+  def create_tile(self, source, pos, size, texture_region):
+      tile = Tile(source, pos, size, texture_region)
       self.add_widget(tile)
       
   def update(self, dt):
