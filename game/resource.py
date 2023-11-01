@@ -32,6 +32,7 @@ class ResourceManager(SingletonInstance):
                 if ext in resource_exts:
                     filepath = os.path.join(dirname, filename)
                     resource_name = os.path.relpath(filepath, resource_path)
+                    resource_name = os.path.splitext(resource_name)[0]
                     from kivy.logger import Logger
                     Logger.info(resource_name)
                     resource_map[resource_name] = Resource(
