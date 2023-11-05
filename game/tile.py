@@ -13,9 +13,7 @@ class Tile(Scatter):
         self.add_widget(image)
     
     def update(self, dt):
-        from KivyRPG.main import KivyRPGApp
-        KivyRPGApp.instance().debug_text.text = str(dt)
-
+        pass
 
 class TileManager(Widget, SingletonInstance):
   def __init__(self, **kargs):
