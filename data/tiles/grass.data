@@ -1,4 +1,4 @@
 {
-    source: "data/images/tiles_00.png", 
+    source: "tiles_00", 
     region: (32, 192, 32, 32)
 }

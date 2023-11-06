@@ -1,4 +1,6 @@
 import os
+from kivy.logger import Logger
+from kivy.uix.image import Image
 from utility.singleton import SingletonInstance
 
 game_path = "KivyRPG"
@@ -13,6 +15,14 @@ class Resource:
         self.loader = loader
         self.filepath = filepath
         self.source = None
+        
+    def get_resource(self):
+        if self.is_loaded:
+            return self.source
+        self.is_loaded = True
+        Logger.info(f"Load {self.name}: {self.filepath}")             
+        self.source = self.loader(self.filepath)
+        return self.source
         
 
 class ResourceManager(SingletonInstance):
@@ -33,16 +43,29 @@ class ResourceManager(SingletonInstance):
                     filepath = os.path.join(dirname, filename)
                     resource_name = os.path.relpath(filepath, resource_path)
                     resource_name = os.path.splitext(resource_name)[0]
-                    from kivy.logger import Logger
-                    Logger.info(resource_name)
+                    Logger.info(f"Register {resource_name}: {filepath}")
                     resource_map[resource_name] = Resource(
                         resource_name,
-                        filename,
+                        filepath,
                         resource_loader
                     )
                     
-    def image_loader(self, filepath):
-        pass
+    def get_resource(self, resource_map, resource_name):
+        if resource_name in resource_map:
+            resource = resource_map[resource_name]
+            return resource.get_resource()
+        Logger.warning(f"not found {resource_name}")
         
+    def get_image(self, resource_name):
+        return self.get_resource(self.images, resource_name)
+    
+    def get_tile(self, resource_name):
+        return self.get_resource(self.tiles, resource_name)
+        
+    def image_loader(self, filepath):
+        return Image(source=filepath)
+    
     def tile_loader(self, filepath):
         pass
+        
+        

@@ -58,8 +58,8 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         
     def update_debug_print(self):
         fps = Clock.get_fps()
-        time = 1.0 / fps if 0 < fps else 0
-        self.debug_text.text = f"fps: {format(fps, '0.2f')}\ntime(ms): {format(time, '0.3f')}"
+        time = 1000.0 / fps if 0 < fps else 0
+        self.debug_text.text = f"fps: {format(fps, '0.2f')}\ntime(ms): {format(time, '0.2f')}"
         self.debug_text.height = self.debug_text.minimum_height
         self.debug_text.pos = (0, self.height - self.debug_text.height)
        

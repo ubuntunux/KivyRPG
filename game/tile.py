@@ -3,13 +3,15 @@ from kivy.uix.image import Image
 from kivy.uix.scatter import Scatter
 from kivy.uix.widget import Widget
 from utility.singleton import SingletonInstance
+from .resource import ResourceManager
 
 
 class Tile(Scatter):
     def __init__(self, source, pos, size, texture_region):
         super().__init__(pos=pos, size=size)
-        image = Image(source=source, size=size, keep_ratio=False, allow_stretch=True)
-        image.texture = image.texture.get_region(*texture_region)
+        src_image = ResourceManager.instance().get_image("tiles_00")
+        image = Image(size=size, keep_ratio=False, allow_stretch=True)
+        image.texture = src_image.texture.get_region(*texture_region)
         self.add_widget(image)
     
     def update(self, dt):
