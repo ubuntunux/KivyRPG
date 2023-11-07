@@ -14,12 +14,13 @@ from app.app import BaseApp, MainApp
 from utility.kivy_widgets import KivyLabel
 from utility.singleton import SingletonInstance
 from .game.tile import TileManager
-from .game.resource import ResourceManager
+from .game.game_resource import GameResourceManager
+
 
 class KivyRPGApp(BaseApp, SingletonInstance):
     def __init__(self, app_name):
         super(KivyRPGApp, self).__init__(app_name)
-        self.resource_manager = ResourceManager.instance()
+        self.resource_manager = GameResourceManager.instance()
         self.tile_manager = TileManager.instance()
         
     def initialize(self):
