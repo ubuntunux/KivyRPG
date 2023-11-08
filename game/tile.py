@@ -7,11 +7,10 @@ from .game_resource import GameResourceManager
 
 
 class Tile(Scatter):
-    def __init__(self, source, pos, size, texture_region):
+    def __init__(self, tile_name, pos, size):
         super().__init__(pos=pos, size=size)
-        src_image = GameResourceManager.instance().get_image("tiles_00")
-        image = Image(size=size, keep_ratio=False, allow_stretch=True)
-        image.texture = src_image.texture.get_region(*texture_region)
+        tile_data = GameResourceManager.instance().get_tile_data(tile_name)
+        image = Image(texture=tile_data.texture, size=size, keep_ratio=False, allow_stretch=True)
         self.add_widget(image)
     
     def update(self, dt):
@@ -24,8 +23,8 @@ class TileManager(Widget, SingletonInstance):
   def reset_tiles(self):
     self.clear_widgets()
     
-  def create_tile(self, source, pos, size, texture_region):
-      tile = Tile(source, pos, size, texture_region)
+  def create_tile(self, tile_name, pos, size):
+      tile = Tile(tile_name, pos, size)
       self.add_widget(tile)
       
   def update(self, dt):

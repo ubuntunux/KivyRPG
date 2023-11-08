@@ -37,15 +37,9 @@ class KivyRPGApp(BaseApp, SingletonInstance):
                 size=64
                 texture_size=32
                 self.tile_manager.create_tile(
-                    source="KivyRPG/data/images/tiles_00.png",
+                    tile_name="grass",
                     pos=(size*x,size*y),
-                    size=(size, size),
-                    texture_region=(
-                        texture_size*x, 
-                        texture_size*y,
-                        texture_size,
-                        texture_size
-                    )
+                    size=(size, size)
                 )
         # print debug
         self.debug_text = KivyLabel(

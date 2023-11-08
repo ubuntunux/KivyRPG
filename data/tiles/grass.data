@@ -1,4 +1,4 @@
 {
-    source: "tiles_00", 
-    region: (32, 192, 32, 32)
+    "source": "tiles_00", 
+    "region": (32, 192, 32, 32)
 }
