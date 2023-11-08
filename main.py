@@ -37,7 +37,7 @@ class KivyRPGApp(BaseApp, SingletonInstance):
                 size=64
                 texture_size=32
                 self.tile_manager.create_tile(
-                    tile_name="grass",
+                    tile_name="tile_set_00/grass",
                     pos=(size*x,size*y),
                     size=(size, size)
                 )
