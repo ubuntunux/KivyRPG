@@ -3,30 +3,13 @@ from kivy.logger import Logger
 from kivy.uix.image import Image
 from utility.singleton import SingletonInstance
 from utility.resource import ResourceManager
+from .tile_data import TileData, TileDataSet
 
 game_path = "KivyRPG"
 images_path = os.path.join(game_path, "data/images")
 maps_path = os.path.join(game_path, "data/maps")
 tile_data_path = os.path.join(game_path, "data/tiles")
-
-
-class TileData():
-    def __init__(self, tile_set_name, tile_name, texture):
-        self.tile_path = os.path.join(tile_set_name, tile_name)
-        self.name = tile_name
-        self.texture = texture
-
-class TileSet():
-    def __init__(self, name, src_image, tile_data):
-        self.name = name
-        self.tile_data = {}
-        for (tile_name, tile_data_info) in tile_data.items():
-            texture = src_image.texture.get_region(*tile_data_info["region"])
-            self.tile_data[tile_name] = TileData(name, tile_name, texture)
-    
-    def get_tile_data(self, tile_name):
-        return self.tile_data.get(tile_name)
-    
+   
 
 class GameResourceManager(ResourceManager):
     def __init__(self):
@@ -56,6 +39,6 @@ class GameResourceManager(ResourceManager):
                 data = eval(f.read())
                 src_image = self.get_image(data["source"])
                 tile_data = data["tile_data"]
-                return TileSet(name, src_image, tile_data)
+                return TileDataSet(name, src_image, tile_data)
                 
                 
