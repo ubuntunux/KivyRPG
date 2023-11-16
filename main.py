@@ -11,9 +11,9 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 
 from app.app import BaseApp, MainApp
-from utility.kivy_widgets import KivyLabel
+from utility.kivy_widgets import DebugLabel
 from utility.singleton import SingletonInstance
-from .game.tile import TileManager
+from .game.level import LevelManager
 from .game.game_resource import GameResourceManager
 
 
@@ -21,7 +21,8 @@ class KivyRPGApp(BaseApp, SingletonInstance):
     def __init__(self, app_name):
         super(KivyRPGApp, self).__init__(app_name)
         self.resource_manager = GameResourceManager.instance()
-        self.tile_manager = TileManager.instance()
+        self.level_manager = LevelManager.instance()
+        self.debug_label = None
         
     def initialize(self):
         self.resource_manager.initialize()
@@ -29,36 +30,28 @@ class KivyRPGApp(BaseApp, SingletonInstance):
 
     def on_stop(self):
         pass
-    
+        
     def build(self):
-        self.add_widget(self.tile_manager)
-        for y in range(16):
-            for x in range(16):
-                size=64
-                texture_size=32
-                self.tile_manager.create_tile(
-                    tile_name="tile_set_00/grass",
-                    pos=(size*x,size*y),
-                    size=(size, size)
-                )
+        self.add_widget(self.level_manager)
+        self.level_manager.open_level("default")
+        
         # print debug
-        self.debug_text = KivyLabel(
+        self.debug_label = DebugLabel(
+            pos=(0, self.height),
             text="debug", 
             halign='left',
             font_size="12sp",
             size_hint=(None, None),
             width=self.width
         )
-        self.add_widget(self.debug_text)
+        self.add_widget(self.debug_label)
         
-    def update_debug_print(self):
-        fps = Clock.get_fps()
-        time = 1000.0 / fps if 0 < fps else 0
-        self.debug_text.text = f"fps: {format(fps, '0.2f')}\ntime(ms): {format(time, '0.2f')}"
-        self.debug_text.height = self.debug_text.minimum_height
-        self.debug_text.pos = (0, self.height - self.debug_text.height)
-       
+    def debug_print(self, text):
+        self.debug_label.debug_print(text)
+        
     def update(self, dt):
-        self.update_debug_print()
-        self.tile_manager.update(dt)
+        self.debug_label.update(dt)
+        self.debug_label.pos = (0, self.height - self.debug_label.height)
+        
+        self.level_manager.update(dt)
         

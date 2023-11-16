@@ -3,7 +3,7 @@ from kivy.logger import Logger
 from kivy.uix.image import Image
 from utility.singleton import SingletonInstance
 from utility.resource import ResourceManager
-from .tile_data import TileData, TileDataSet
+from .tile import TileData, TileDataSet
 
 game_path = "KivyRPG"
 images_path = os.path.join(game_path, "data/images")
