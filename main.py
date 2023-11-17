@@ -32,7 +32,7 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         pass
         
     def build(self):
-        self.add_widget(self.level_manager)
+        self.level_manager.build(self)
         self.level_manager.open_level("default")
         
         # print debug
