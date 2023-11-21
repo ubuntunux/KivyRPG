@@ -26,13 +26,15 @@ class TileDataSet():
 class Tile(Button):
     def __init__(self, tile_data, pos, size):
         super().__init__(pos=pos, size=size)
-        image = Image(texture=tile_data.texture, pos=pos, size=size, keep_ratio=False, allow_stretch=True)
-        self.add_widget(image)
+        self.image = Image(texture=tile_data.texture, pos=pos, size=size, keep_ratio=False, allow_stretch=True)
+        self.add_widget(self.image)
         self.bind(on_press=self.on_pressed)
+    
+    def get_pixels(self):
+        return list(self.image.texture.pixels)
     
     def on_pressed(self, inst):
         main.KivyRPGApp.instance().debug_print(str(inst))
-        
         
     def update(self, dt):
         pass

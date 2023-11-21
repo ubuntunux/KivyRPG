@@ -21,19 +21,21 @@ class KivyRPGApp(BaseApp, SingletonInstance):
     def __init__(self, app_name):
         super(KivyRPGApp, self).__init__(app_name)
         self.resource_manager = GameResourceManager.instance()
-        self.level_manager = LevelManager.instance()
+        self.level_manager = LevelManager.instance(self)
         self.debug_label = None
         
     def initialize(self):
         self.resource_manager.initialize()
-        self.build() 
+        self.build()
+        
+        self.level_manager.open_level("default")
+        
 
     def on_stop(self):
         pass
         
     def build(self):
         self.level_manager.build(self)
-        self.level_manager.open_level("default")
         
         # print debug
         self.debug_label = DebugLabel(
