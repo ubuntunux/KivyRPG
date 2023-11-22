@@ -27,9 +27,12 @@ class LevelManager(SingletonInstance):
         self.tiles.clear()
         self.tile_map.clear_widgets()
     
-    def create_tile(self, tile_name, pos, size):
-        tile_data = GameResourceManager.instance().get_tile_data(tile_name)  
-        return Tile(tile_data, pos, size)
+    def create_tile(self, tile_set_name, tile_name, tile_pos):
+        tile_data_set = GameResourceManager.instance().get_tile_data_set(tile_set_name)  
+        if tile_data_set:
+            tile_data = tile_data_set.get_tile_data(tile_name)
+            if tile_data:
+                return Tile(tile_data, tile_pos)
       
     def open_level(self, level_name):
         self.reset_tiles()
@@ -55,9 +58,9 @@ class LevelManager(SingletonInstance):
             for x in range(num_x):
                 # create tile
                 tile = self.create_tile(
-                    tile_name="tile_set_00/grass",
-                    pos=(tile_image_size * x, tile_image_size * y),
-                    size=(tile_image_size, tile_image_size)
+                    tile_set_name="tile_set_00",
+                    tile_name="grass",
+                    tile_pos=(x, y)
                 )
                 # blit texture
                 pixels = tile.get_pixels()

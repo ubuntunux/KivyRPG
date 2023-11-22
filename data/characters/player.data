@@ -1,0 +1,8 @@
+{
+    "source": "rpg_sprites_10",
+    "actions": {
+        "idle": {
+            "region": (32, 128, 32, 32)
+        }
+    }
+}
