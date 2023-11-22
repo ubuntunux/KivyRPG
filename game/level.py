@@ -7,6 +7,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 from utility.singleton import SingletonInstance
 from .game_resource import GameResourceManager
+from .character import Character
 from .tile import Tile
 
 
@@ -75,5 +76,13 @@ class LevelManager(SingletonInstance):
         with self.tile_map.canvas:
             Rectangle(texture=texture, size=self.tile_map.size)
         
+        character_data = GameResourceManager.instance().get_character_data("player")
+        character = Character(
+            character_data, 
+            pos=(0,0),
+            size=(256,256)
+        )
+        self.tile_map.add_widget(character)
+       
     def update(self, dt):
         pass

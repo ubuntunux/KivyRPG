@@ -3,6 +3,7 @@ from kivy.logger import Logger
 from kivy.uix.image import Image
 from utility.singleton import SingletonInstance
 from utility.resource import ResourceManager
+from .character import CharacterData
 from .tile import TileData, TileDataSet
 
 game_path = "KivyRPG"
@@ -44,13 +45,14 @@ class GameResourceManager(ResourceManager):
                 return TileDataSet(name, src_image, tile_data)
     
     # character
-    def get_character(self, resource_name):
+    def get_character_data(self, resource_name):
         return self.get_resource(self.character_data, resource_name)
         
     def character_data_loader(self, name, filepath):
         if os.path.exists(filepath):
             with open(filepath) as f:
                 character_data_info = eval(f.read())
-                return CharacterData(self, name, character_data_info)
+                src_image = self.get_image(character_data_info["source"])
+                return CharacterData(name, src_image, character_data_info)
                 
                 
