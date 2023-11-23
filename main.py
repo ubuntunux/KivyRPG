@@ -14,6 +14,7 @@ from app.app import BaseApp, MainApp
 from utility.kivy_widgets import DebugLabel
 from utility.singleton import SingletonInstance
 from .game.level import LevelManager
+from .game.actor import ActorManager
 from .game.game_resource import GameResourceManager
 
 
@@ -22,22 +23,21 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         super(KivyRPGApp, self).__init__(app_name)
         self.resource_manager = GameResourceManager.instance()
         self.level_manager = LevelManager.instance(self)
+        self.actor_manager = ActorManager.instance(self)
         self.debug_label = None
         
     def initialize(self):
         self.resource_manager.initialize()
+        self.level_manager.initialize(self.actor_manager, self)
+        self.actor_manager.initialize()
         self.build()
         
         self.level_manager.open_level("default")
         
-
     def on_stop(self):
         pass
         
     def build(self):
-        self.level_manager.build(self)
-        
-        # print debug
         self.debug_label = DebugLabel(
             pos=(0, self.height),
             text="debug", 
@@ -49,6 +49,8 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.add_widget(self.debug_label)
         
     def debug_print(self, text):
+        if str != type(text):
+            text = str(text)
         self.debug_label.debug_print(text)
         
     def update(self, dt):
@@ -56,4 +58,5 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.debug_label.pos = (0, self.height - self.debug_label.height)
         
         self.level_manager.update(dt)
+        self.actor_manager.update(dt)
         

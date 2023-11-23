@@ -7,26 +7,41 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 from utility.singleton import SingletonInstance
 from .game_resource import GameResourceManager
-from .character import Character
 from .tile import Tile
+from .constant import *
 
 
 class LevelManager(SingletonInstance):
     def __init__(self, app):
         self.tile_map = None
+        self.character_layer = None
+        self.top_layer = None
         self.scroll_view = None
         self.tiles = []
         self.app = app
-    
-    def build(self, parent_widget):
+        self.actor_manager = None
+        
+    def initialize(self, actor_manager, parent_widget):
+        self.actor_manager = actor_manager
         self.tile_map = Widget(size_hint=(None, None))
+        self.tile_map.bind(on_touch_down=self.on_touch_down)
+        self.character_layer = Widget(size_hint=(None, None))
+        self.top_layer = Widget(size_hint=(None, None))
         self.scroll_view = ScrollView(size_hint=(1,1))
-        self.scroll_view.add_widget(self.tile_map)
+        # link
+        self.top_layer.add_widget(self.tile_map)
+        self.top_layer.add_widget(self.character_layer)
+        self.scroll_view.add_widget(self.top_layer)
         parent_widget.add_widget(self.scroll_view)
         
+    def on_touch_down(self, inst, touch):
+        #self.app.debug_print(str(touch.pos))
+        self.actor_manager.get_player().move_to(touch.pos)
+    
     def reset_tiles(self):
         self.tiles.clear()
         self.tile_map.clear_widgets()
+        self.character_layer.clear_widgets()
     
     def create_tile(self, tile_set_name, tile_name, tile_pos):
         tile_data_set = GameResourceManager.instance().get_tile_data_set(tile_set_name)  
@@ -35,7 +50,7 @@ class LevelManager(SingletonInstance):
             if tile_data:
                 return Tile(tile_data, tile_pos)
       
-    def open_level(self, level_name):
+    def generate_tile_map(self, level_name):
         self.reset_tiles()
         texture_size = 32
         stride = 4
@@ -50,10 +65,9 @@ class LevelManager(SingletonInstance):
         texture = Texture.create(size=(width, height), colorfmt='rgba')
         data = ([int(255) for x in range(texture_data_size)])
         # set layout
-        tile_image_size = 128
-        self.tile_map.width = num_x * tile_image_size
-        self.tile_map.height = num_y * tile_image_size
-        
+        self.tile_map.width = num_x * TILE_SIZE
+        self.tile_map.height = num_y * TILE_SIZE
+        self.top_layer.size = self.tile_map.size
         for y in range(num_y):
             tiles = []
             for x in range(num_x):
@@ -76,13 +90,9 @@ class LevelManager(SingletonInstance):
         with self.tile_map.canvas:
             Rectangle(texture=texture, size=self.tile_map.size)
         
-        character_data = GameResourceManager.instance().get_character_data("player")
-        character = Character(
-            character_data, 
-            pos=(0,0),
-            size=(256,256)
-        )
-        self.tile_map.add_widget(character)
-       
+    def open_level(self, level_name):
+        self.generate_tile_map(level_name)
+        self.actor_manager.create_actors(self.top_layer)
+    
     def update(self, dt):
         pass
