@@ -65,8 +65,8 @@ class LevelManager(SingletonInstance):
         texture = Texture.create(size=(width, height), colorfmt='rgba')
         data = ([int(255) for x in range(texture_data_size)])
         # set layout
-        self.tile_map.width = num_x * TILE_SIZE
-        self.tile_map.height = num_y * TILE_SIZE
+        self.tile_map.width = num_x * TILE_WIDTH
+        self.tile_map.height = num_y * TILE_HEIGHT
         self.top_layer.size = self.tile_map.size
         for y in range(num_y):
             tiles = []

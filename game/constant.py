@@ -1,1 +1,5 @@
-TILE_SIZE = 128
+from kivy.vector import Vector
+
+TILE_WIDTH = 128
+TILE_HEIGHT = TILE_WIDTH
+TILE_SIZE = (TILE_WIDTH, TILE_HEIGHT)

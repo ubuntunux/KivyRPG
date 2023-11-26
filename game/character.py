@@ -6,36 +6,10 @@ from kivy.uix.scatter import Scatter
 from kivy.uix.widget import Widget
 from kivy.vector import Vector
 from utility.kivy_helper import *
+from .transform_component import TransformComponent
+from .constant import *
 from .. import main
-
-class TransformComponent():
-    def __init__(self, pos):
-        self.pos = Vector(pos)
-        self.walk_speed = 1000.0
-        self.target_pos = Vector(pos)
-        self.is_complete = True
-        
-    def get_pos(self):
-        return self.pos
-        
-    def move_to(self, pos):
-        if pos != self.pos:
-            self.is_complete = False
-            self.target_pos = Vector(pos)
-    
-    def update_transform(self, dt):
-        if False == self.is_complete:
-            to_target = (self.target_pos - self.pos).normalize()
-            move_dist = self.walk_speed * dt
-            dist = self.target_pos.distance(self.pos)
-            
-            if dist <= move_dist:
-                self.pos = self.target_pos
-                self.is_complete = True
-            else:
-                self.pos = self.pos + to_target * move_dist
-            return True
-        return False 
+ 
 
 class ActionData():
     def __init__(self, character_name, action_name, texture):
