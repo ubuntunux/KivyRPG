@@ -5,6 +5,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
+from utility.kivy_helper import *
 from utility.singleton import SingletonInstance
 from .game_resource import GameResourceManager
 from .tile import Tile
@@ -18,10 +19,14 @@ class LevelManager(SingletonInstance):
         self.top_layer = None
         self.scroll_view = None
         self.tiles = []
+        self.actors = []
+        self.actor_map = {}
         self.app = app
         self.actor_manager = None
+        self.num_x = 16
+        self.num_y = 16
         
-    def initialize(self, actor_manager, parent_widget):
+    def initialize(self, parent_widget, actor_manager):
         self.actor_manager = actor_manager
         self.tile_map = Widget(size_hint=(None, None))
         self.tile_map.bind(on_touch_down=self.on_touch_down)
@@ -36,8 +41,40 @@ class LevelManager(SingletonInstance):
         
     def on_touch_down(self, inst, touch):
         self.actor_manager.callback_touch(inst, touch)
+        return True
+    
+    def index_to_pos(self, index):
+        y = int(index / self.num_x)
+        x = index - y
+        return (x, y)
+        
+    def pos_to_index(self, pos):
+        return int(pos[1] * self.num_x + pos[0])
+    
+    def get_actor_pos(self, actor):
+        return self.actor_map.get(actor)
+        
+    def get_actor(self, pos):
+        index = self.pos_to_index(pos)
+        if index < len(self.actors):
+            return self.actors[index]
+        return None
+        
+    def set_actor(self, actor, pos):
+        old_pos = self.get_actor_pos(actor)
+        if old_pos is not None:
+            index = self.pos_to_index(old_pos)
+            if index < len(self.actors):
+                self.actors[index] = None
+            self.actor_map.remove(actor)
+        index = self.pos_to_index(pos)
+        if index < len(self.actors):
+            self.actors[index] = actor
+            self.actor_map[actor] = pos        
     
     def reset_tiles(self):
+        self.actor_map.clear()
+        self.actors.clear()
         self.tiles.clear()
         self.tile_map.clear_widgets()
         self.character_layer.clear_widgets()
@@ -51,25 +88,27 @@ class LevelManager(SingletonInstance):
       
     def generate_tile_map(self, level_name):
         self.reset_tiles()
+        self.num_x = 16
+        self.num_y = 16
+        num_tiles = self.num_x * self.num_y
+        self.actors = [None for i in range(num_tiles)]
+        
         texture_size = 32
         stride = 4
         row_data_length = texture_size * stride
-        
-        num_x = 16
-        num_y = 16
-        width = num_x * texture_size
-        height = num_y * texture_size
+        width = self.num_x * texture_size
+        height = self.num_y * texture_size
         texture_data_size = width * height * stride   
         # create texture
         texture = Texture.create(size=(width, height), colorfmt='rgba')
         data = ([int(255) for x in range(texture_data_size)])
         # set layout
-        self.tile_map.width = num_x * TILE_WIDTH
-        self.tile_map.height = num_y * TILE_HEIGHT
+        self.tile_map.width = self.num_x * TILE_WIDTH
+        self.tile_map.height = self.num_y * TILE_HEIGHT
         self.top_layer.size = self.tile_map.size
-        for y in range(num_y):
+        for y in range(self.num_y):
             tiles = []
-            for x in range(num_x):
+            for x in range(self.num_x):
                 # create tile
                 tile = self.create_tile(
                     tile_set_name="tile_set_00",
@@ -80,7 +119,7 @@ class LevelManager(SingletonInstance):
                 pixels = tile.get_pixels()
                 for py in range(texture_size):
                     pixel_offset = py * texture_size * stride
-                    data_offset = ((y * texture_size + py) * num_x + x) * texture_size * stride
+                    data_offset = ((y * texture_size + py) * self.num_x + x) * texture_size * stride
                     data[data_offset: data_offset + row_data_length] = pixels[pixel_offset: pixel_offset + row_data_length] 
                 tiles.append(tile)
             self.tiles.append(tiles)

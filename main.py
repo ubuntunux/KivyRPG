@@ -28,8 +28,8 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         
     def initialize(self):
         self.resource_manager.initialize()
-        self.level_manager.initialize(self.actor_manager, self)
-        self.actor_manager.initialize()
+        self.level_manager.initialize(self, self.actor_manager)
+        self.actor_manager.initialize(self.level_manager)
         self.build()
         
         self.level_manager.open_level("default")

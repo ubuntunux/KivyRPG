@@ -48,11 +48,16 @@ class Character(Scatter):
         self.transform_component = TransformComponent(pos)
         self.center = self.transform_component.get_pos()
         self.is_player = is_player
+        self.updated_transform = False
     
     def on_touch_down(inst, touch):
+        # do nothing
         return False
+    
+    def get_front(self):
+        return self.transfrom.front
 
-    def get_front_x(self):
+    def get_direction_x(self):
         return sign(self.transform[0])
         
     def flip_widget(self):
@@ -67,11 +72,11 @@ class Character(Scatter):
          
     def update(self, dt):
         self.behavior.update_behavior(dt)
-        updated = self.transform_component.update_transform(dt)
-        if updated:
+        self.updated_transform = self.transform_component.update_transform(dt)
+        if self.updated_transform:
             self.center = self.transform_component.get_pos()
-            prev_front_x = self.get_front_x()
+            prev_direction_x = self.get_direction_x()
             curr_front_x = sign(self.transform_component.front.x)
-            if 0 != curr_front_x and prev_front_x != curr_front_x:
+            if 0 != curr_front_x and prev_direction_x != curr_front_x:
                 self.flip_widget()
             

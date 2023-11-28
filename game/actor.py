@@ -11,11 +11,12 @@ from .constant import *
 class ActorManager(SingletonInstance):
     def __init__(self, app):
         self.app = app
+        self.level_manager = None
         self.actors = []
         self.player = None
         
-    def initialize(self):
-        pass
+    def initialize(self, level_manager):
+        self.level_manager = level_manager
         
     def get_player(self):
         return self.player
