@@ -1,11 +1,13 @@
 import os
 from kivy.logger import Logger
+from kivy.graphics.transformation import Matrix
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.scatter import Scatter
 from kivy.uix.widget import Widget
 from kivy.vector import Vector
 from utility.kivy_helper import *
+from .behavior import *
 from .transform_component import TransformComponent
 from .constant import *
 from .. import main
@@ -26,6 +28,7 @@ class CharacterData():
         for (action_name, action_data_info) in action_data_infos.items():
             texture = src_image.texture.get_region(*action_data_info["region"])
             self.action_data[action_name] = ActionData(name, action_name, texture)
+        self.behavior_class = eval(character_data_info.get("behavior_class"))
     
     def get_action_data(self, action_name):
         return self.action_data.get(action_name)
@@ -40,14 +43,35 @@ class Character(Scatter):
             self.image.texture = action_data.texture  
         self.add_widget(self.image)
         
+        self.behavior = character_data.behavior_class()
+        
         self.transform_component = TransformComponent(pos)
         self.center = self.transform_component.get_pos()
         self.is_player = is_player
+    
+    def on_touch_down(inst, touch):
+        return False
 
+    def get_front_x(self):
+        return sign(self.transform[0])
+        
+    def flip_widget(self):
+        self.apply_transform(
+            Matrix().scale(-1.0, 1.0, 1.0),
+            post_multiply=True,
+            anchor=self.to_local(*self.center)
+        )
+    
     def move_to(self, target_pos: Vector):
         self.transform_component.move_to(target_pos)
          
-    def update(self, dt, force=False):
+    def update(self, dt):
+        self.behavior.update_behavior(dt)
         updated = self.transform_component.update_transform(dt)
         if updated:
             self.center = self.transform_component.get_pos()
+            prev_front_x = self.get_front_x()
+            curr_front_x = sign(self.transform_component.front.x)
+            if 0 != curr_front_x and prev_front_x != curr_front_x:
+                self.flip_widget()
+            

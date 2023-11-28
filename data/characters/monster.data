@@ -5,5 +5,5 @@
             "region": (0, 0, 1022/4, 584/2)
         }
     },
-    "behavior_class": "Player"
+    "behavior_class": "Monster"
 }

@@ -35,8 +35,7 @@ class LevelManager(SingletonInstance):
         parent_widget.add_widget(self.scroll_view)
         
     def on_touch_down(self, inst, touch):
-        #self.app.debug_print(str(touch.pos))
-        self.actor_manager.get_player().move_to(touch.pos)
+        self.actor_manager.callback_touch(inst, touch)
     
     def reset_tiles(self):
         self.tiles.clear()

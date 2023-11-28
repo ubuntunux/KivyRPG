@@ -6,12 +6,14 @@ from .. import main
 
 class TransformComponent():
     def __init__(self, pos):
-        pos = get_discrete_center(pos, TILE_SIZE)
         self.pos = Vector(pos)
-        self.walk_speed = 1000.0
+        self.tile_pos = get_discrete_center(pos, TILE_SIZE)
+        self.front = Vector(1, 0)
         self.target_positions = []
-        self.is_1d_type = True
+        self.grid_based_movement = True
         self.logger = main.KivyRPGApp.instance()
+        # properties
+        self.walk_speed = 1000.0
         
     def get_pos(self):
         return self.pos
@@ -20,7 +22,7 @@ class TransformComponent():
         target_pos = Vector(get_discrete_center(target_pos, TILE_SIZE))
         if target_pos != self.pos:
             self.target_positions = [Vector(target_pos)]
-            if self.is_1d_type:
+            if self.grid_based_movement:
                 tile_pos = Vector(get_discrete_center(self.pos, TILE_SIZE))
                 to_tile = (tile_pos - self.pos)
                 is_vertical_line = (to_tile.x == 0.0)
@@ -43,5 +45,6 @@ class TransformComponent():
                 self.target_positions.pop()
             else:
                 self.pos = self.pos + to_target * move_dist
+            self.front = to_target
             return True
         return False

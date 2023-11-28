@@ -3,8 +3,10 @@ from kivy.vector import Vector
 from utility.singleton import SingletonInstance
 from utility.kivy_helper import *
 from .game_resource import GameResourceManager
+from .behavior import Monster
 from .character import Character
 from .constant import *
+
 
 class ActorManager(SingletonInstance):
     def __init__(self, app):
@@ -25,8 +27,19 @@ class ActorManager(SingletonInstance):
         
     def create_actors(self, parent_widget):
         is_player = True
+        player_pos = (10, 10)
         character_data = GameResourceManager.instance().get_character_data("player")  
-        pos = Vector(get_discrete_center((500,500), TILE_SIZE))
+        self.create_actor(parent_widget, character_data, player_pos, is_player)
+        
+        is_player = False
+        monster_positions = [(5, 5), (8, 8)]
+        character_data = GameResourceManager.instance().get_character_data("monster")  
+        for pos in monster_positions:
+            self.create_actor(parent_widget, character_data, pos, is_player)   
+        
+    def create_actor(self, parent_widget, character_data, tile_indices, is_player):
+        pos = Vector(tile_indices) * TILE_SIZE
+        pos = get_discrete_center(pos, TILE_SIZE)
         character = Character(
             character_data=character_data,
             pos=pos,
@@ -37,6 +50,9 @@ class ActorManager(SingletonInstance):
         if is_player:
             self.player = character
         self.actors.append(character)
+        
+    def callback_touch(self, inst, touch):
+        self.get_player().move_to(touch.pos)
     
     def update(self, dt):
         for actor in self.actors:
