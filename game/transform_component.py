@@ -20,22 +20,21 @@ class TransformComponent():
         
     def get_tile_pos(self):
         return self.tile_pos
-        
+           
     def move_to(self, target_tile_pos):
-        if target_tile_pos != self.tile_pos:
-            target_pos = tile_to_pos(target_tile_pos)
-            self.target_positions = [Vector(target_pos)]
-            if self.grid_based_movement:
-                tile_world_pos = tile_to_pos(self.tile_pos)
-                to_tile = (tile_world_pos - self.pos)
-                is_vertical_line = (to_tile.x == 0.0)
-                to_target = (target_pos - tile_world_pos)
-                is_origin = (tile_world_pos == self.pos)
-                if is_vertical_line or abs(to_target.x) <= abs(to_target.y):
-                    target_pos.x = tile_world_pos.x
-                else:
-                    target_pos.y = tile_world_pos.y
-                self.target_positions.append(target_pos)        
+        target_pos = tile_to_pos(target_tile_pos)
+        self.target_positions = [Vector(target_pos)]
+        if self.grid_based_movement:
+            tile_world_pos = tile_to_pos(self.tile_pos)
+            to_tile = (tile_world_pos - self.pos)
+            is_vertical_line = (to_tile.x == 0.0)
+            to_target = (target_pos - tile_world_pos)
+            is_origin = (tile_world_pos == self.pos)
+            if is_vertical_line or abs(to_target.x) <= abs(to_target.y):
+                target_pos.x = tile_world_pos.x
+            else:
+                target_pos.y = tile_world_pos.y
+            self.target_positions.append(target_pos)        
         
     def update_transform(self, dt):
         if self.target_positions:
