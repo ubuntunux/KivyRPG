@@ -35,15 +35,13 @@ class ActorManager(SingletonInstance):
         is_player = False
         monster_positions = [(5, 5), (8, 8)]
         character_data = GameResourceManager.instance().get_character_data("monster")  
-        for pos in monster_positions:
-            self.create_actor(parent_widget, character_data, pos, is_player)   
+        for tile_pos in monster_positions:
+            self.create_actor(parent_widget, character_data, Vector(tile_pos), is_player)   
         
-    def create_actor(self, parent_widget, character_data, tile_indices, is_player):
-        pos = Vector(tile_indices) * TILE_SIZE
-        pos = get_discrete_center(pos, TILE_SIZE)
+    def create_actor(self, parent_widget, character_data, tile_pos, is_player):
         character = Character(
             character_data=character_data,
-            pos=pos,
+            tile_pos=tile_pos,
             size=TILE_SIZE,
             is_player=is_player
         )
@@ -53,7 +51,8 @@ class ActorManager(SingletonInstance):
         self.actors.append(character)
         
     def callback_touch(self, inst, touch):
-        self.get_player().move_to(touch.pos)
+        tile_pos = pos_to_tile(touch.pos)
+        self.get_player().move_to(tile_pos)
     
     def update(self, dt):
         for actor in self.actors:

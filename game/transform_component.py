@@ -5,9 +5,9 @@ from .constant import *
 from .. import main
 
 class TransformComponent():
-    def __init__(self, pos):
-        self.pos = Vector(pos)
-        self.tile_pos = get_discrete_center(pos, TILE_SIZE)
+    def __init__(self, tile_pos):
+        self.tile_pos = Vector(tile_pos)
+        self.pos = tile_to_pos(tile_pos)
         self.front = Vector(1, 0)
         self.target_positions = []
         self.grid_based_movement = True
@@ -18,20 +18,23 @@ class TransformComponent():
     def get_pos(self):
         return self.pos
         
-    def move_to(self, target_pos):
-        target_pos = Vector(get_discrete_center(target_pos, TILE_SIZE))
-        if target_pos != self.pos:
+    def get_tile_pos(self):
+        return self.tile_pos
+        
+    def move_to(self, target_tile_pos):
+        if target_tile_pos != self.tile_pos:
+            target_pos = tile_to_pos(target_tile_pos)
             self.target_positions = [Vector(target_pos)]
             if self.grid_based_movement:
-                tile_pos = Vector(get_discrete_center(self.pos, TILE_SIZE))
-                to_tile = (tile_pos - self.pos)
+                tile_world_pos = tile_to_pos(self.tile_pos)
+                to_tile = (tile_world_pos - self.pos)
                 is_vertical_line = (to_tile.x == 0.0)
-                to_target = (target_pos - tile_pos)
-                is_origin = (tile_pos == self.pos)
+                to_target = (target_pos - tile_world_pos)
+                is_origin = (tile_world_pos == self.pos)
                 if is_vertical_line or abs(to_target.x) <= abs(to_target.y):
-                    target_pos.x = tile_pos.x
+                    target_pos.x = tile_world_pos.x
                 else:
-                    target_pos.y = tile_pos.y
+                    target_pos.y = tile_world_pos.y
                 self.target_positions.append(target_pos)        
         
     def update_transform(self, dt):
@@ -46,5 +49,6 @@ class TransformComponent():
             else:
                 self.pos = self.pos + to_target * move_dist
             self.front = to_target
+            self.tile_pos = pos_to_tile(self.pos)
             return True
         return False

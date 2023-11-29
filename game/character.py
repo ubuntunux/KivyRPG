@@ -35,8 +35,8 @@ class CharacterData():
         
 
 class Character(Scatter):
-    def __init__(self, character_data, pos, size, is_player):
-        super().__init__(center=pos, size=size)
+    def __init__(self, character_data, tile_pos, size, is_player):
+        super().__init__(size=size)
         self.image = Image(size=size, keep_ratio=False, allow_stretch=True)
         action_data = character_data.get_action_data("idle")
         if action_data:
@@ -44,11 +44,10 @@ class Character(Scatter):
         self.add_widget(self.image)
         
         self.behavior = character_data.behavior_class()
-        
-        self.transform_component = TransformComponent(pos)
+        self.transform_component = TransformComponent(tile_pos)
         self.center = self.transform_component.get_pos()
-        self.is_player = is_player
         self.updated_transform = False
+        self.is_player = is_player
     
     def on_touch_down(inst, touch):
         # do nothing
@@ -67,9 +66,12 @@ class Character(Scatter):
             anchor=self.to_local(*self.center)
         )
     
-    def move_to(self, target_pos: Vector):
-        self.transform_component.move_to(target_pos)
+    def move_to(self, tile_pos: Vector):
+        self.transform_component.move_to(tile_pos)
          
+    def get_tile_pos(self):
+        return self.transform_component.get_tile_pos()
+    
     def update(self, dt):
         self.behavior.update_behavior(dt)
         self.updated_transform = self.transform_component.update_transform(dt)
