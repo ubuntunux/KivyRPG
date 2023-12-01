@@ -44,7 +44,7 @@ class Character(Scatter):
         self.add_widget(self.image)
         
         self.behavior = character_data.behavior_class()
-        self.transform_component = TransformComponent(tile_pos)
+        self.transform_component = TransformComponent(self, tile_pos)
         self.center = self.transform_component.get_pos()
         self.updated_transform = False
         self.is_player = is_player
@@ -72,9 +72,9 @@ class Character(Scatter):
     def get_tile_pos(self):
         return self.transform_component.get_tile_pos()
     
-    def update(self, dt):
+    def update(self, level_manager, dt):
         self.behavior.update_behavior(dt)
-        self.updated_transform = self.transform_component.update_transform(dt)
+        self.updated_transform = self.transform_component.update_transform(level_manager, dt)
         if self.updated_transform:
             self.center = self.transform_component.get_pos()
             prev_direction_x = self.get_direction_x()

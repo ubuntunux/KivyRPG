@@ -51,6 +51,10 @@ class LevelManager(SingletonInstance):
     def pos_to_index(self, pos):
         return int(pos[1] * self.num_x + pos[0])
     
+    def is_blocked(self, pos, filter_actor=None):
+        actor = self.get_actor(pos)
+        return actor is not filter_actor and actor is not None
+    
     def get_actor_pos(self, actor):
         return self.actor_map.get(actor)
         
@@ -60,17 +64,17 @@ class LevelManager(SingletonInstance):
             return self.actors[index]
         return None
         
-    def set_actor(self, actor, pos):
+    def set_actor(self, actor, tile_pos):
         old_pos = self.get_actor_pos(actor)
         if old_pos is not None:
             index = self.pos_to_index(old_pos)
             if index < len(self.actors):
                 self.actors[index] = None
-            self.actor_map.remove(actor)
-        index = self.pos_to_index(pos)
+            self.actor_map.pop(actor)
+        index = self.pos_to_index(tile_pos)
         if index < len(self.actors):
             self.actors[index] = actor
-            self.actor_map[actor] = pos        
+            self.actor_map[actor] = Vector(tile_pos)      
     
     def reset_tiles(self):
         self.actor_map.clear()

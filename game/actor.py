@@ -56,6 +56,6 @@ class ActorManager(SingletonInstance):
     
     def update(self, dt):
         for actor in self.actors:
-            actor.update(dt)
-    
+            actor.update(self.level_manager, dt)
+            self.level_manager.set_actor(actor, actor.get_tile_pos())
         
