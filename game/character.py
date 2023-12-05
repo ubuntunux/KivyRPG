@@ -73,8 +73,9 @@ class Character(Scatter):
         return self.transform_component.get_tile_pos()
     
     def update(self, level_manager, dt):
-        self.behavior.update_behavior(dt)
+        self.behavior.update_behavior(self, level_manager, dt)
         self.updated_transform = self.transform_component.update_transform(level_manager, dt)
+        
         if self.updated_transform:
             self.center = self.transform_component.get_pos()
             prev_direction_x = self.get_direction_x()
