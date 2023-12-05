@@ -1,3 +1,4 @@
+from kivy.logger import Logger
 from kivy.vector import Vector
 from utility.kivy_helper import *
 
@@ -23,4 +24,5 @@ def get_next_tile_pos(tile_pos, front):
         next_tile_pos.y += sign(front.y)
     else:
         next_tile_pos.x += sign(front.x)
+    #Logger.info((tile_pos, front))
     return next_tile_pos

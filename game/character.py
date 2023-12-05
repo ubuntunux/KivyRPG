@@ -66,8 +66,8 @@ class Character(Scatter):
             anchor=self.to_local(*self.center)
         )
     
-    def move_to(self, tile_pos: Vector):
-        self.transform_component.move_to(tile_pos)
+    def move_to(self, level_manager, tile_pos):
+        self.transform_component.move_to(level_manager, tile_pos)
          
     def get_tile_pos(self):
         return self.transform_component.get_tile_pos()

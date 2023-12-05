@@ -44,7 +44,9 @@ class KivyRPGApp(BaseApp, SingletonInstance):
             halign='left',
             font_size="12sp",
             size_hint=(None, None),
-            width=self.width
+            width=self.width,
+            display_count=40,
+            display_time=20
         )
         self.add_widget(self.debug_label)
         

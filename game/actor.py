@@ -52,7 +52,7 @@ class ActorManager(SingletonInstance):
         
     def callback_touch(self, inst, touch):
         tile_pos = pos_to_tile(touch.pos)
-        self.get_player().move_to(tile_pos)
+        self.get_player().move_to(self.level_manager, tile_pos)
     
     def update(self, dt):
         for actor in self.actors:
