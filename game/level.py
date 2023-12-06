@@ -51,12 +51,15 @@ class LevelManager(SingletonInstance):
     def pos_to_index(self, pos):
         return int(pos[1] * self.num_x + pos[0])
     
+    def is_in_level(self, tile_pos):
+        return 0 <= tile_pos.x and tile_pos.x <= (self.num_x - 1) and 0 <= tile_pos.y and tile_pos.y <= (self.num_y - 1)
+    
     def is_blocked(self, pos, filter_actor=None):
         actor = self.get_actor(pos)
         return actor is not filter_actor and actor is not None
     
-    def get_actor_pos(self, actor):
-        return self.actor_map.get(actor)
+    def get_actor_area(self, actor):
+        return self.actor_map.get(actor, [])
         
     def get_actor(self, pos):
         index = self.pos_to_index(pos)
@@ -64,17 +67,27 @@ class LevelManager(SingletonInstance):
             return self.actors[index]
         return None
         
-    def set_actor(self, actor, tile_pos):
-        old_pos = self.get_actor_pos(actor)
-        if old_pos is not None:
+    def set_actor(self, actor):
+        # remove
+        old_area = self.get_actor_area(actor)
+        for old_pos in old_area:
             index = self.pos_to_index(old_pos)
             if index < len(self.actors):
                 self.actors[index] = None
+        if self.actor_map.get(actor) is not None:
             self.actor_map.pop(actor)
-        index = self.pos_to_index(tile_pos)
-        if index < len(self.actors):
-            self.actors[index] = actor
-            self.actor_map[actor] = Vector(tile_pos)      
+        # set
+        main_tile_pos = actor.get_tile_pos()
+        tile_to_actor = actor.get_pos() - tile_to_pos(main_tile_pos)
+        coverage_tile = get_next_tile_pos(main_tile_pos, tile_to_actor)
+        area = [main_tile_pos]
+        if main_tile_pos != coverage_tile:
+            area.append(coverage_tile)
+        for tile_pos in area:
+            index = self.pos_to_index(tile_pos)
+            if index < len(self.actors):
+                self.actors[index] = actor
+        self.actor_map[actor] = area    
     
     def reset_tiles(self):
         self.actor_map.clear()

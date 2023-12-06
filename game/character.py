@@ -29,7 +29,7 @@ class CharacterData():
             texture = src_image.texture.get_region(*action_data_info["region"])
             self.action_data[action_name] = ActionData(name, action_name, texture)
         self.behavior_class = eval(character_data_info.get("behavior_class"))
-    
+        self.properties = character_data_info.get("properties", {})
     def get_action_data(self, action_name):
         return self.action_data.get(action_name)
         
@@ -43,8 +43,9 @@ class Character(Scatter):
             self.image.texture = action_data.texture  
         self.add_widget(self.image)
         
+        self.properties = character_data.properties  
         self.behavior = character_data.behavior_class()
-        self.transform_component = TransformComponent(self, tile_pos)
+        self.transform_component = TransformComponent(self, tile_pos, self.properties)
         self.center = self.transform_component.get_pos()
         self.updated_transform = False
         self.is_player = is_player
@@ -69,6 +70,9 @@ class Character(Scatter):
     def move_to(self, level_manager, tile_pos):
         self.transform_component.move_to(level_manager, tile_pos)
          
+    def get_pos(self):
+        return self.transform_component.get_pos()
+    
     def get_tile_pos(self):
         return self.transform_component.get_tile_pos()
     

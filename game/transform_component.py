@@ -5,7 +5,7 @@ from .constant import *
 from .. import main
 
 class TransformComponent():
-    def __init__(self, actor, tile_pos):
+    def __init__(self, actor, tile_pos, properties):
         self.actor = actor
         self.tile_pos = Vector(tile_pos)
         self.pos = tile_to_pos(tile_pos)
@@ -14,7 +14,7 @@ class TransformComponent():
         self.grid_based_movement = True
         self.logger = main.KivyRPGApp.instance()
         # properties
-        self.walk_speed = 1000.0
+        self.walk_speed = properties.get("walk_speed", 500.0)
         
     def get_pos(self):
         return self.pos
@@ -22,7 +22,22 @@ class TransformComponent():
     def get_tile_pos(self):
         return self.tile_pos
         
+    def set_pos(self, pos):
+        self.pos = Vector(pos)
+        self.tile_pos = pos_to_tile(pos)
+    
+    def set_front(self, front):
+        dir_x = sign(front.x)
+        dir_y = sign(front.y)
+        if abs(dir_x) < abs(dir_y):
+            self.front = Vector(0, dir_y)
+        elif abs(dir_y) < abs(dir_x):
+            self.front = Vector(dir_x, 0)
+            
     def path_find(self, level_manager, tile_pos, target_tile_pos, target_dir, checked_list, paths, depth=0):
+        if tile_pos == target_tile_pos:
+            paths = [Vector(target_tile_pos)]
+            return True
         #Logger.info((depth, "tile:", tile_pos, "target: ", target_tile_pos, "dir: ", target_dir))
         if 100 < depth:
             return False
@@ -46,11 +61,9 @@ class TransformComponent():
                 return True
             is_in_checked_list = p in checked_list
             checked_list.append(p)
-            if is_in_checked_list:
-                #Logger.info((depth, "checked", p))
-                continue
-            elif level_manager.is_blocked(p, self.actor):
-                #Logger.info((depth, "blocked", p))
+            if is_in_checked_list \
+                or level_manager.is_blocked(p, self.actor) \
+                or not level_manager.is_in_level(p):
                 continue
             #Logger.info((">> next_tile_pos: ", p))
             next_target_dir = (target_tile_pos - p)
@@ -100,25 +113,26 @@ class TransformComponent():
             # calc next pos
             next_pos = self.pos + to_target * move_dist
             tile_world_pos = tile_to_pos(self.tile_pos)
-            to_tile = (tile_world_pos - self.pos).normalize()
-            next_to_tile = (tile_world_pos - next_pos).normalize()
-            # check blocked
-            if to_tile.dot(next_to_tile) <= 0:
-                next_tile_pos = get_next_tile_pos(self.tile_pos, to_target) 
-                if level_manager.is_blocked(next_tile_pos, self.actor):
-                    # blocked, stop
-                    target_pos = Vector(tile_world_pos)
-                    dist = target_pos.distance(self.pos)
-                    next_pos = Vector(target_pos)
-                    
-            # move    
+            to_tile = (tile_world_pos - self.pos)
+            next_to_tile = (tile_world_pos - next_pos)    
+            # move 
+            prev_pos = Vector(self.pos)
             if dist <= move_dist:
-                self.pos = target_pos
+                self.set_pos(target_pos)
                 if self.target_positions:
                     self.target_positions.pop()
             else:
-                self.pos = next_pos
-            self.front = to_target
-            self.tile_pos = pos_to_tile(self.pos)
+                self.set_pos(next_pos)
+            # check blocked
+            tile_to_actor = self.pos - tile_to_pos(self.tile_pos)
+            coverage_tile_pos = get_next_tile_pos(self.tile_pos, tile_to_actor)
+            if level_manager.is_blocked(coverage_tile_pos, self.actor):
+                self.set_pos(prev_pos)
+                if self.target_positions:
+                    target_tile_pos = pos_to_tile(self.target_positions[0])
+                    # self.move_to(level_manager, target_tile_pos)
+            # final
+            level_manager.set_actor(self.actor)
+            self.set_front(to_target)
             return True
         return False
