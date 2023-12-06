@@ -7,6 +7,7 @@ from .. import main
 class TransformComponent():
     def __init__(self, actor, tile_pos, properties):
         self.actor = actor
+        self.target_actor = None
         self.tile_pos = Vector(tile_pos)
         self.pos = tile_to_pos(tile_pos)
         self.front = Vector(1, 0)
@@ -21,6 +22,10 @@ class TransformComponent():
         
     def get_tile_pos(self):
         return self.tile_pos
+        
+    def get_coverage_tile_pos(self):
+        tile_to_actor = self.pos - tile_to_pos(self.tile_pos)
+        return get_next_tile_pos(self.tile_pos, tile_to_actor)
         
     def set_pos(self, pos):
         self.pos = Vector(pos)
@@ -74,7 +79,12 @@ class TransformComponent():
                 return True
         #Logger.info((depth, "not found"))
         return False
-            
+        
+    def trace_actor(self, level_manager, actor):
+        self.target_actor = actor
+        if actor is not None:
+            self.move_to(level_manager, actor.get_tile_pos())
+        
     def move_to(self, level_manager, target_tile_pos):
         target_pos = tile_to_pos(target_tile_pos)
         if self.grid_based_movement:
@@ -103,10 +113,11 @@ class TransformComponent():
                     self.target_positions.append(tile_to_pos(p))
             #Logger.info(("Result: ", self.target_positions))
             
-    def update_transform(self, level_manager, dt):
+    def update_transform(self, level_manager, dt):   
         if self.target_positions:
             # calc target pos
             target_pos = self.target_positions[-1]
+            target_tile_pos = pos_to_tile(target_pos)
             to_target = (target_pos - self.pos).normalize()
             move_dist = self.walk_speed * dt
             dist = target_pos.distance(self.pos)
@@ -126,15 +137,19 @@ class TransformComponent():
                 self.set_pos(next_pos)
             self.set_front(to_target)
             # check blocked
-            tile_to_actor = self.pos - tile_to_pos(self.tile_pos)
-            coverage_tile_pos = get_next_tile_pos(self.tile_pos, tile_to_actor)
+            coverage_tile_pos = self.get_coverage_tile_pos()
             if level_manager.is_blocked(coverage_tile_pos, self.actor):
                 self.set_pos(prev_pos)
                 if self.target_positions:
                     target_tile_pos = pos_to_tile(self.target_positions[0])
                     self.move_to(level_manager, target_tile_pos)
-            
+            # regist actor
             if prev_pos != self.pos:
                 level_manager.set_actor(self.actor)
+            # trace target  
+            if self.target_actor \
+                and target_tile_pos != self.target_actor.get_tile_pos() \
+                and prev_tile_pos != self.tile_pos:
+                self.move_to(level_manager, self.target_actor.get_tile_pos())
             return True
         return False

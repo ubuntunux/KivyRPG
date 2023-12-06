@@ -68,7 +68,11 @@ class Character(Scatter):
         )
     
     def move_to(self, level_manager, tile_pos):
+        self.transform_component.trace_actor(level_manager, None)
         self.transform_component.move_to(level_manager, tile_pos)
+    
+    def trace_actor(self, level_manager, actor):
+        self.transform_component.trace_actor(level_manager, actor)
          
     def get_pos(self):
         return self.transform_component.get_pos()
@@ -76,6 +80,9 @@ class Character(Scatter):
     def get_tile_pos(self):
         return self.transform_component.get_tile_pos()
     
+    def get_coverage_tile_pos(self):
+        return self.transform_component.get_coverage_tile_pos()
+             
     def update(self, level_manager, dt):
         self.behavior.update_behavior(self, level_manager, dt)
         self.updated_transform = self.transform_component.update_transform(level_manager, dt)

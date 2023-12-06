@@ -52,8 +52,12 @@ class ActorManager(SingletonInstance):
         
     def callback_touch(self, inst, touch):
         tile_pos = pos_to_tile(touch.pos)
-        self.get_player().move_to(self.level_manager, tile_pos)
-    
+        actor = self.level_manager.get_actor(tile_pos)
+        if actor is not None:
+            self.get_player().trace_actor(self.level_manager, actor)
+        else:
+            self.get_player().move_to(self.level_manager, tile_pos)
+            
     def update(self, dt):
         for actor in self.actors:
             actor.update(self.level_manager, dt)
