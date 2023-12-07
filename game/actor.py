@@ -58,6 +58,13 @@ class ActorManager(SingletonInstance):
         else:
             self.get_player().move_to(self.level_manager, tile_pos)
             
+    def callback_attack(self, inst):
+        for actor in self.actors:
+            if actor is not self.player:
+                actor.parent.remove_widget(actor)
+                self.actors.remove(actor)
+                return
+
     def update(self, dt):
         for actor in self.actors:
             actor.update(self.level_manager, dt)
