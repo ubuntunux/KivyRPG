@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 from kivy.logger import Logger
 from kivy.graphics.transformation import Matrix
@@ -11,7 +12,12 @@ from .behavior import *
 from .transform_component import TransformComponent
 from .constant import *
 from .. import main
+
  
+class ActionState(Enum):
+    IDLE = 0
+    ATTACK = 1
+
 
 class ActionData():
     def __init__(self, character_name, action_name, texture):
@@ -19,6 +25,32 @@ class ActionData():
         self.name = action_name
         self.texture = texture
 
+class Action():
+    def __init__(self, action_data):
+        self.action_data = action_data
+        self.action_state = ActionState.IDLE
+        self.action_time = 0.0
+    
+    def get_action_state(self):
+        return self.action_state
+    
+    def set_action_state(self, action_state):
+        self.action_state = action_state
+        self.action_time = 0.5
+        
+    def get_current_texture(self):
+        action_data = self.action_data.get("idle")
+        if action_data:
+             return action_data.texture
+        return None
+        
+    def update_action(self, dt):
+        if ActionState.IDLE != self.action_state:
+            if self.action_time < 0:
+                self.set_action_state(ActionState.IDLE)
+        
+        if 0 < self.action_time:
+            self.action_time -= dt
 
 class CharacterData():
     def __init__(self, name, src_image, character_data_info):
@@ -30,17 +62,14 @@ class CharacterData():
             self.action_data[action_name] = ActionData(name, action_name, texture)
         self.behavior_class = eval(character_data_info.get("behavior_class"))
         self.properties = character_data_info.get("properties", {})
-    def get_action_data(self, action_name):
-        return self.action_data.get(action_name)
-        
 
 class Character(Scatter):
     def __init__(self, character_data, tile_pos, size, is_player):
         super().__init__(size=size)
+        
+        self.action = Action(character_data.action_data)
         self.image = Image(size=size, keep_ratio=False, allow_stretch=True)
-        action_data = character_data.get_action_data("idle")
-        if action_data:
-            self.image.texture = action_data.texture  
+        self.image.texture = self.action.get_current_texture()
         self.add_widget(self.image)
         
         self.properties = character_data.properties  
@@ -55,7 +84,7 @@ class Character(Scatter):
         return False
     
     def get_front(self):
-        return self.transfrom.front
+        return self.transform_component.get_front()
 
     def get_direction_x(self):
         return sign(self.transform[0])
@@ -74,6 +103,14 @@ class Character(Scatter):
     def trace_actor(self, level_manager, actor):
         self.transform_component.trace_actor(level_manager, actor)
          
+    def get_attack_point(self):
+        if ActionState.ATTACK == self.action.get_action_state():
+            return get_next_tile_pos(self.get_tile_pos(), self.get_front())
+        return None
+        
+    def set_attack(self):
+        self.action.set_action_state(ActionState.ATTACK)
+    
     def get_pos(self):
         return self.transform_component.get_pos()
     
@@ -85,8 +122,8 @@ class Character(Scatter):
              
     def update(self, level_manager, dt):
         self.behavior.update_behavior(self, level_manager, dt)
+        self.action.update_action(dt)
         self.updated_transform = self.transform_component.update_transform(level_manager, dt)
-        
         if self.updated_transform:
             self.center = self.transform_component.get_pos()
             prev_direction_x = self.get_direction_x()

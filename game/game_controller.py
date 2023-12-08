@@ -20,8 +20,8 @@ class GameController(SingletonInstance):
     def initialize(self, parent_widget, level_manager, actor_manager):
         self.level_manager = level_manager
         self.actor_manager = actor_manager
-        self.controller_layer = Widget(size_hint=(None, None))
-        btn = Button(text="Button", pos=(Window.width-300,0), size=(300, 300), opacity=0.5)
+        self.controller_layer = BoxLayout(orientation='vertical', size_hint=(1,1))
+        btn = Button(text="Attack", pos_hint={"right":1}, size_hint=(None, None), size=(300, 300), opacity=0.5)
         btn.bind(on_press=actor_manager.callback_attack)
         self.controller_layer.add_widget(btn)
         parent_widget.add_widget(self.controller_layer)

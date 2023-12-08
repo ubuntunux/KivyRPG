@@ -23,6 +23,9 @@ class TransformComponent():
     def get_tile_pos(self):
         return self.tile_pos
         
+    def get_front(self):
+        return self.front
+        
     def get_coverage_tile_pos(self):
         tile_to_actor = self.pos - tile_to_pos(self.tile_pos)
         return get_next_tile_pos(self.tile_pos, tile_to_actor)

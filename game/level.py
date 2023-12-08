@@ -43,6 +43,9 @@ class LevelManager(SingletonInstance):
         self.actor_manager.callback_touch(inst, touch)
         return True
     
+    def get_character_layout(self):
+        return self.character_layer
+    
     def index_to_pos(self, index):
         y = int(index / self.num_x)
         x = index - y
@@ -67,15 +70,18 @@ class LevelManager(SingletonInstance):
             return self.actors[index]
         return None
         
+    def pop_actor(self, actor):
+        if actor is not None:
+            old_area = self.get_actor_area(actor)
+            for old_pos in old_area:
+                index = self.pos_to_index(old_pos)
+                if index < len(self.actors):
+                    self.actors[index] = None
+            if self.actor_map.get(actor) is not None:
+                self.actor_map.pop(actor)
+        
     def set_actor(self, actor):
-        # remove
-        old_area = self.get_actor_area(actor)
-        for old_pos in old_area:
-            index = self.pos_to_index(old_pos)
-            if index < len(self.actors):
-                self.actors[index] = None
-        if self.actor_map.get(actor) is not None:
-            self.actor_map.pop(actor)
+        self.pop_actor(actor)
         # set
         main_tile_pos = actor.get_tile_pos()
         tile_to_actor = actor.get_pos() - tile_to_pos(main_tile_pos)
