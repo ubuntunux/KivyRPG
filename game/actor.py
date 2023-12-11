@@ -54,6 +54,7 @@ class ActorManager(SingletonInstance):
             is_player=is_player
         )
         parent_widget.add_widget(character)
+        self.level_manager.set_actor(character)
         if is_player:
             self.player = character
         self.actors.append(character)
@@ -72,7 +73,7 @@ class ActorManager(SingletonInstance):
     def update(self, dt):
         # update
         for actor in self.actors:
-            actor.update(self.level_manager, dt)
+            actor.update(self, self.level_manager, dt)
         # interaction
         dead_characters = []
         for actor in self.actors:

@@ -4,12 +4,15 @@ from utility.kivy_helper import *
 from .constant import *
 from .. import main
 
+
 class TransformComponent():
     def __init__(self, actor, tile_pos, properties):
         self.actor = actor
         self.target_actor = None
         self.tile_pos = Vector(tile_pos)
         self.pos = tile_to_pos(tile_pos)
+        self.prev_tile_pos = Vector(tile_pos)
+        self.prev_pos = tile_to_pos(tile_pos)
         self.front = Vector(1, 0)
         self.target_positions = []
         self.grid_based_movement = True
@@ -22,6 +25,12 @@ class TransformComponent():
         
     def get_tile_pos(self):
         return self.tile_pos
+        
+    def get_prev_pos(self):
+        return self.prev_pos
+        
+    def get_prev_tile_pos(self):
+        return self.prev_tile_pos
         
     def get_front(self):
         return self.front
@@ -116,10 +125,10 @@ class TransformComponent():
                     self.target_positions.append(tile_to_pos(p))
             #Logger.info(("Result: ", self.target_positions))
             
-    def update_transform(self, level_manager, dt):   
-        if self.target_positions:
+    def update_transform(self, level_manager, dt, force_update=False):   
+        if self.target_positions or force_update:
             # calc target pos
-            target_pos = self.target_positions[-1]
+            target_pos = self.target_positions[-1] if self.target_positions else Vector(self.pos)
             target_tile_pos = pos_to_tile(target_pos)
             to_target = (target_pos - self.pos).normalize()
             move_dist = self.walk_speed * dt
@@ -130,8 +139,8 @@ class TransformComponent():
             to_tile = (tile_world_pos - self.pos)
             next_to_tile = (tile_world_pos - next_pos)    
             # move 
-            prev_pos = Vector(self.pos)
-            prev_tile_pos = Vector(self.tile_pos)
+            self.prev_pos = Vector(self.pos)
+            self.prev_tile_pos = Vector(self.tile_pos)
             if dist <= move_dist:
                 self.set_pos(target_pos)
                 if self.target_positions:
@@ -142,17 +151,17 @@ class TransformComponent():
             # check blocked
             coverage_tile_pos = self.get_coverage_tile_pos()
             if level_manager.is_blocked(coverage_tile_pos, self.actor):
-                self.set_pos(prev_pos)
+                self.set_pos(self.prev_pos)
                 if self.target_positions:
                     target_tile_pos = pos_to_tile(self.target_positions[0])
                     self.move_to(level_manager, target_tile_pos)
             # regist actor
-            if prev_pos != self.pos:
+            if self.prev_pos != self.pos or force_update:
                 level_manager.set_actor(self.actor)
             # trace target  
             if self.target_actor \
                 and target_tile_pos != self.target_actor.get_tile_pos() \
-                and prev_tile_pos != self.tile_pos:
+                and self.prev_tile_pos != self.tile_pos:
                 self.move_to(level_manager, self.target_actor.get_tile_pos())
             return True
         return False

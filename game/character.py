@@ -25,6 +25,7 @@ class ActionData():
         self.name = action_name
         self.texture = texture
 
+
 class Action():
     def __init__(self, action_data):
         self.action_data = action_data
@@ -52,6 +53,7 @@ class Action():
         if 0 < self.action_time:
             self.action_time -= dt
 
+
 class CharacterData():
     def __init__(self, name, src_image, character_data_info):
         self.name = name
@@ -63,6 +65,7 @@ class CharacterData():
         self.behavior_class = eval(character_data_info.get("behavior_class"))
         self.properties = character_data_info.get("properties", {})
 
+
 class Character(Scatter):
     def __init__(self, character_data, tile_pos, size, is_player):
         super().__init__(size=size)
@@ -73,21 +76,17 @@ class Character(Scatter):
         self.add_widget(self.image)
         
         self.properties = character_data.properties  
-        self.behavior = character_data.behavior_class()
+        self.behavior = character_data.behavior_class(self)
         self.transform_component = TransformComponent(self, tile_pos, self.properties)
         self.center = self.transform_component.get_pos()
-        self.updated_transform = False
+        self.updated_pos = True
+        self.updated_tile_pos = True
+        self.spawn_tile_pos = Vector(tile_pos)
         self.is_player = is_player
     
     def on_touch_down(inst, touch):
         # do nothing
         return False
-    
-    def get_front(self):
-        return self.transform_component.get_front()
-
-    def get_direction_x(self):
-        return sign(self.transform[0])
         
     def flip_widget(self):
         self.apply_transform(
@@ -103,6 +102,12 @@ class Character(Scatter):
     def trace_actor(self, level_manager, actor):
         self.transform_component.trace_actor(level_manager, actor)
          
+    def get_spawn_tile_pos(self):
+        return self.spawn_tile_pos
+    
+    def set_spawn_tile_pos(self, spawn_tile_pos):
+        self.spawn_tile_pos = Vector(spawn_tile_pos)
+        
     def get_attack_point(self):
         if ActionState.ATTACK == self.action.get_action_state():
             return get_next_tile_pos(self.get_tile_pos(), self.get_front())
@@ -111,20 +116,39 @@ class Character(Scatter):
     def set_attack(self):
         self.action.set_action_state(ActionState.ATTACK)
     
+    def get_front(self):
+        return self.transform_component.get_front()
+
+    def get_direction_x(self):
+        return sign(self.transform[0])
+    
     def get_pos(self):
         return self.transform_component.get_pos()
     
     def get_tile_pos(self):
         return self.transform_component.get_tile_pos()
     
+    def get_prev_pos(self):
+        return self.transform_component.get_prev_pos()
+    
+    def get_prev_tile_pos(self):
+        return self.transform_component.get_prev_tile_pos()
+    
     def get_coverage_tile_pos(self):
         return self.transform_component.get_coverage_tile_pos()
              
-    def update(self, level_manager, dt):
-        self.behavior.update_behavior(self, level_manager, dt)
+    def get_updated_pos(self):
+        return self.updated_pos
+        
+    def get_updated_tile_pos(self):
+        return self.updated_tile_pos
+    
+    def update(self, actor_manager, level_manager, dt):
+        self.behavior.update_behavior(actor_manager, level_manager, dt)
         self.action.update_action(dt)
-        self.updated_transform = self.transform_component.update_transform(level_manager, dt)
-        if self.updated_transform:
+        self.updated_pos = self.transform_component.update_transform(level_manager, dt)
+        self.updated_tile_pos = self.get_prev_tile_pos() != self.get_tile_pos()
+        if self.updated_pos:
             self.center = self.transform_component.get_pos()
             prev_direction_x = self.get_direction_x()
             curr_front_x = sign(self.transform_component.front.x)
