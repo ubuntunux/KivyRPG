@@ -16,6 +16,7 @@ class LevelManager(SingletonInstance):
     def __init__(self, app):
         self.tile_map = None
         self.character_layer = None
+        self.effect_layout = None
         self.top_layer = None
         self.scroll_view = None
         self.tiles = []
@@ -31,11 +32,13 @@ class LevelManager(SingletonInstance):
         self.tile_map = Widget(size_hint=(None, None))
         self.tile_map.bind(on_touch_down=self.on_touch_down)
         self.character_layer = Widget(size_hint=(None, None))
+        self.effect_layer = Widget(size_hint=(None, None))
         self.top_layer = Widget(size_hint=(None, None))
         self.scroll_view = ScrollView(size_hint=(1,1))
         # link
         self.top_layer.add_widget(self.tile_map)
         self.top_layer.add_widget(self.character_layer)
+        self.top_layer.add_widget(self.effect_layer)
         self.scroll_view.add_widget(self.top_layer)
         parent_widget.add_widget(self.scroll_view)
         
@@ -45,6 +48,9 @@ class LevelManager(SingletonInstance):
     
     def get_character_layout(self):
         return self.character_layer
+        
+    def get_effect_layout(self):
+        return self.effect_layer
     
     def index_to_pos(self, index):
         y = int(index / self.num_x)

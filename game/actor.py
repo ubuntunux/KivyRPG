@@ -16,9 +16,9 @@ class ActorManager(SingletonInstance):
         self.actors = []
         self.player = None
         
-    def initialize(self, level_manager):
+    def initialize(self, level_manager, character_layout):
         self.level_manager = level_manager
-        self.character_layout = level_manager.get_character_layout()
+        self.character_layout = character_layout
         
     def get_player(self):
         return self.player
