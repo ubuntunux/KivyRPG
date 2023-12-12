@@ -28,17 +28,17 @@ class ActorManager(SingletonInstance):
             actor.parent.remove_widget(actor)
         self.actors.clear()
         
-    def create_actors(self, parent_widget):
+    def create_actors(self):
         is_player = True
         player_pos = (10, 10)
         character_data = GameResourceManager.instance().get_character_data("player")  
-        self.create_actor(parent_widget, character_data, player_pos, is_player)
+        self.create_actor(character_data, player_pos, is_player)
         
         is_player = False
         monster_positions = [(5, 5), (8, 8)]
         character_data = GameResourceManager.instance().get_character_data("monster")  
         for tile_pos in monster_positions:
-            self.create_actor(parent_widget, character_data, Vector(tile_pos), is_player)   
+            self.create_actor(character_data, Vector(tile_pos), is_player)   
         
     def remove_actor(self, actor):
         if actor is not None:
@@ -46,14 +46,14 @@ class ActorManager(SingletonInstance):
             self.actors.remove(actor)
             self.level_manager.pop_actor(actor)
     
-    def create_actor(self, parent_widget, character_data, tile_pos, is_player):
+    def create_actor(self, character_data, tile_pos, is_player):
         character = Character(
             character_data=character_data,
             tile_pos=tile_pos,
             size=TILE_SIZE,
             is_player=is_player
         )
-        parent_widget.add_widget(character)
+        self.character_layout.add_widget(character)
         self.level_manager.set_actor(character)
         if is_player:
             self.player = character

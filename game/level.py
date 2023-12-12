@@ -27,8 +27,9 @@ class LevelManager(SingletonInstance):
         self.num_x = 16
         self.num_y = 16
         
-    def initialize(self, parent_widget, actor_manager):
+    def initialize(self, parent_widget, actor_manager, fx_manager):
         self.actor_manager = actor_manager
+        self.fx_manager = fx_manager
         self.tile_map = Widget(size_hint=(None, None))
         self.tile_map.bind(on_touch_down=self.on_touch_down)
         self.character_layer = Widget(size_hint=(None, None))
@@ -159,7 +160,8 @@ class LevelManager(SingletonInstance):
         
     def open_level(self, level_name):
         self.generate_tile_map(level_name)
-        self.actor_manager.create_actors(self.top_layer)
+        self.actor_manager.create_actors()
+        self.fx_manager.create_effects()
     
     def update(self, dt):
         pass
