@@ -18,7 +18,7 @@ class FxManager(EffectManager):
         self.level_manager = level_manager
         super(FxManager, self).initialize(effect_layout)
         
-    def create_effects(self):
+    def create_effects(self, player):
         game_resource = GameResourceManager.instance()
         particle_info = dict(
             loop=-1,
@@ -35,5 +35,6 @@ class FxManager(EffectManager):
             gravity=RangeVar(0.0)
         )
         self.create_emitter('explosion', particle_info, 20, pos=(200,200), size=(200,200))
-        self.get_emitter('explosion').play_particle()
+        effect = self.get_emitter('explosion')
+        effect.play_particle(player, True)
         
