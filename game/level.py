@@ -42,6 +42,7 @@ class LevelManager(SingletonInstance):
         self.top_layer.add_widget(self.effect_layer)
         self.scroll_view.add_widget(self.top_layer)
         parent_widget.add_widget(self.scroll_view)
+        self.update_layer_size(self.top_layer.size)
         
     def on_touch_down(self, inst, touch):
         self.actor_manager.callback_touch(inst, touch)
@@ -102,6 +103,12 @@ class LevelManager(SingletonInstance):
                 self.actors[index] = actor
         self.actor_map[actor] = area    
     
+    def update_layer_size(self, layer_size):
+        self.top_layer.size = layer_size
+        self.effect_layer.size = layer_size
+        self.character_layer.size = layer_size
+        
+    
     def reset_tiles(self):
         self.actor_map.clear()
         self.actors.clear()
@@ -135,7 +142,7 @@ class LevelManager(SingletonInstance):
         # set layout
         self.tile_map.width = self.num_x * TILE_WIDTH
         self.tile_map.height = self.num_y * TILE_HEIGHT
-        self.top_layer.size = self.tile_map.size
+        self.update_layer_size(self.tile_map.size)
         for y in range(self.num_y):
             tiles = []
             for x in range(self.num_x):
