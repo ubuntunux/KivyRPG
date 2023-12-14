@@ -21,7 +21,7 @@ class FxManager(EffectManager):
     def create_effects(self, player):
         game_resource = GameResourceManager.instance()
         particle_info = dict(
-            is_world_space=True,
+            is_world_space=False,
             loop=-1,
             fade=1,
             color=(1,1,1,1),
@@ -37,7 +37,7 @@ class FxManager(EffectManager):
         )
         self.create_emitter(
             emitter_name='explosion',
-            attach_to=player,
+            attach_to=None,
             pos=(50,50),
             size=(100,100),
             particle_info=particle_info,
