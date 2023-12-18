@@ -21,7 +21,7 @@ class GameResourceManager(ResourceManager):
     
     def initialize(self):
         self.register_resources(images_path, [".png", ".jpg"], self.images, self.image_loader)
-        self.register_resources(effects_path, [".data"], self.particle_data, self.particle_data_loader)
+        self.register_resources(effects_path, [".data"], self.effect_data, self.effect_data_loader)
         self.register_resources(tile_data_path, [".data"], self.tile_data_set, self.tile_data_loader)
         self.register_resources(character_data_path, [".data"], self.character_data, self.character_data_loader)
     

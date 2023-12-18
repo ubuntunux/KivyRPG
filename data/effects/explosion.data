@@ -1,4 +1,8 @@
 {
+"emitter_data": {
+    "particle_count": 20
+},
+"particle_data": {
     "is_world_space":True,
     "elastin":0.8, 
     "collision":False, 
@@ -18,4 +22,5 @@
     "scaling":RangeVar(1.0, 2.0),
     "opacity":RangeVar(1.0),
     "offset":RangeVar((-20,20), (-20,20)),
+}
 }

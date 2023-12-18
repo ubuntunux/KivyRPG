@@ -168,7 +168,7 @@ class LevelManager(SingletonInstance):
     def open_level(self, level_name):
         self.generate_tile_map(level_name)
         self.actor_manager.create_actors()
-        self.fx_manager.create_effects(self.actor_manager.get_player())
+        effect = self.fx_manager.create_effect("explosion", self.actor_manager.get_player())
     
     def update(self, dt):
         pass
