@@ -35,9 +35,9 @@ class Action():
     def get_action_state(self):
         return self.action_state
     
-    def set_action_state(self, action_state):
+    def set_action_state(self, action_state, action_time=0):
         self.action_state = action_state
-        self.action_time = 0.01
+        self.action_time = action_time
         
     def get_current_texture(self):
         action_data = self.action_data.get("idle")
@@ -50,7 +50,7 @@ class Action():
             if self.action_time < 0:
                 self.set_action_state(ActionState.IDLE)
         
-        if 0 < self.action_time:
+        if 0 <= self.action_time:
             self.action_time -= dt
 
 
