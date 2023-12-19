@@ -69,6 +69,9 @@ class ActorManager(SingletonInstance):
             
     def callback_attack(self, inst):
         self.player.set_attack()
+    
+    def attack(self, actor, target):
+        target.set_damage(50.0)
         
     def update(self, dt):
         # update
@@ -81,7 +84,9 @@ class ActorManager(SingletonInstance):
             if pos is not None:
                 target = self.level_manager.get_actor(pos)
                 if actor is not target and target is not None:
-                    dead_characters.append(target)
+                    self.attack(actor, target)
+                    if not target.is_alive():
+                        dead_characters.append(target)
         # dead
         for actor in dead_characters:
             self.remove_actor(actor)

@@ -7,6 +7,8 @@
     },
     "behavior_class": "Player",
     "properties": {
-        "walk_speed": 500.0
+        "walk_speed": 500.0,
+        "max_hp": 100.0,
+        "max_mp": 100.0
     }
 }

@@ -17,8 +17,7 @@ class TransformComponent():
         self.target_positions = []
         self.grid_based_movement = True
         self.logger = main.KivyRPGApp.instance()
-        # properties
-        self.walk_speed = properties.get("walk_speed", 500.0)
+        self.properties = properties
         
     def get_pos(self):
         return self.pos
@@ -131,7 +130,7 @@ class TransformComponent():
             target_pos = self.target_positions[-1] if self.target_positions else Vector(self.pos)
             target_tile_pos = pos_to_tile(target_pos)
             to_target = (target_pos - self.pos).normalize()
-            move_dist = self.walk_speed * dt
+            move_dist = self.properties.get_walk_speed() * dt
             dist = target_pos.distance(self.pos)
             # calc next pos
             next_pos = self.pos + to_target * move_dist

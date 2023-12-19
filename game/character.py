@@ -37,7 +37,7 @@ class Action():
     
     def set_action_state(self, action_state):
         self.action_state = action_state
-        self.action_time = 0.5
+        self.action_time = 0.01
         
     def get_current_texture(self):
         action_data = self.action_data.get("idle")
@@ -54,6 +54,39 @@ class Action():
             self.action_time -= dt
 
 
+class CharacterPropertyData():
+    def __init__(self, property_data):
+        self.walk_speed = 100.0
+        self.max_hp = 100.0
+        self.max_mp = 100.0
+        for (key, value) in property_data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+
+class CharacterProperties():
+    def __init__(self, property_data):
+        self.hp = 100.0
+        self.mp = 100.0
+        self.property_data = property_data
+    
+    def reset_properties(self):
+        self.hp = self.property_data.max_hp
+        self.mp = self.property_data.max_mp
+    
+    def get_hp(self):
+        return self.hp
+    
+    def get_mp(self):
+        return self.mp
+    
+    def get_walk_speed(self):
+        return self.property_data.walk_speed
+    
+    def set_damage(self, damage):
+        self.hp -= damage
+
+
 class CharacterData():
     def __init__(self, name, src_image, character_data_info):
         self.name = name
@@ -63,7 +96,7 @@ class CharacterData():
             texture = src_image.texture.get_region(*action_data_info["region"])
             self.action_data[action_name] = ActionData(name, action_name, texture)
         self.behavior_class = eval(character_data_info.get("behavior_class"))
-        self.properties = character_data_info.get("properties", {})
+        self.property_data = CharacterPropertyData(character_data_info.get("properties", {}))
 
 
 class Character(Scatter):
@@ -75,7 +108,7 @@ class Character(Scatter):
         self.image.texture = self.action.get_current_texture()
         self.add_widget(self.image)
         
-        self.properties = character_data.properties  
+        self.properties = CharacterProperties(character_data.property_data)
         self.behavior = character_data.behavior_class(self)
         self.transform_component = TransformComponent(self, tile_pos, self.properties)
         self.center = self.transform_component.get_pos()
@@ -94,7 +127,15 @@ class Character(Scatter):
             post_multiply=True,
             anchor=self.to_local(*self.center)
         )
+        
+    # Properties
+    def is_alive(self):
+        return 0 < self.properties.get_hp()
     
+    def set_damage(self, damage):
+        self.properties.set_damage(damage)
+        
+    # Transform
     def move_to(self, level_manager, tile_pos):
         self.transform_component.trace_actor(level_manager, None)
         self.transform_component.move_to(level_manager, tile_pos)
@@ -108,6 +149,7 @@ class Character(Scatter):
     def set_spawn_tile_pos(self, spawn_tile_pos):
         self.spawn_tile_pos = Vector(spawn_tile_pos)
         
+    # Actions
     def get_attack_point(self):
         if ActionState.ATTACK == self.action.get_action_state():
             return get_next_tile_pos(self.get_tile_pos(), self.get_front())

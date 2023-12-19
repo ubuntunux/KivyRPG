@@ -30,3 +30,5 @@ class FxManager(EffectManager):
                 effect_data=effect_data
             )
             emitter.play()
+            return emitter
+        return None
