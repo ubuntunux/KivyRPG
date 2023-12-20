@@ -26,10 +26,12 @@ class CharacterPropertyData():
 
 
 class CharacterData():
-    def __init__(self, name, src_image, character_data_info):
+    def __init__(self, resource_manager, name, character_data_info):
+        src_image = resource_manager.get_image(character_data_info["source"])
+        action_data_infos = character_data_info.get("actions")      
+        
         self.name = name
         self.action_data = {}
-        action_data_infos = character_data_info.get("actions")
         for (action_name, action_data_info) in action_data_infos.items():
             self.action_data[action_name] = ActionData(
                 name,

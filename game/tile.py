@@ -13,10 +13,13 @@ class TileData():
 
 
 class TileDataSet():
-    def __init__(self, name, src_image, tile_data):
+    def __init__(self, resource_manager, name, tile_data_set_info):
+        src_image = resource_manager.get_image(tile_data_set_info["source"])
+        tile_data_infos = tile_data_set_info["tile_data"]
+                
         self.name = name
         self.tile_data = {}
-        for (tile_name, tile_data_info) in tile_data.items():
+        for (tile_name, tile_data_info) in tile_data_infos.items():
             self.tile_data[tile_name] = TileData(
                 name,
                 tile_name,
