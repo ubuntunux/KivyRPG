@@ -7,14 +7,15 @@ class WeaponData():
         self.name = name
         image = resource_manager.get_image(weapon_data_info.get("source", ""))
         region = weapon_data_info.get("region", (0,0,1,1))
-        self.texture = get_texture_atlas(texture, region)
+        self.texture = get_texture_atlas(image.texture, region)
         self.damage = weapon_data_info.get("damage", 10)
         self.size = weapon_data_info.get("size", (100,100))
 
 
 class Weapon(Scatter):
     def __init__(self, pos, weapon_data):
-        super().__init__(pos=pos, size=weapon_data.size)
+        super().__init__(center=pos, size=weapon_data.size)
+        self.weapon_data = weapon_data
         self.image = Image(size=weapon_data.size, keep_ratio=False, allow_stretch=True)
         self.image.texture = weapon_data.texture
         self.add_widget(self.image)
@@ -22,3 +23,6 @@ class Weapon(Scatter):
     def on_touch_down(inst, touch):
         # do nothing
         return False
+        
+    def get_damage(self):
+        return self.weapon_data.damage

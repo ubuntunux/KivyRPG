@@ -71,7 +71,7 @@ class ActorManager(SingletonInstance):
         self.player.set_attack()
     
     def attack(self, actor, target):
-        target.set_damage(50.0)
+        target.set_damage(actor.get_damage())
         
     def update(self, dt):
         # update

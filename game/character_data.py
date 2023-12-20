@@ -41,3 +41,4 @@ class CharacterData():
             )
         self.behavior_class = eval(character_data_info.get("behavior_class"))
         self.property_data = CharacterPropertyData(character_data_info.get("properties", {}))
+        self.weapon_data = resource_manager.get_weapon_data(character_data_info.get("weapon"))

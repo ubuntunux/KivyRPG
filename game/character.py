@@ -7,6 +7,7 @@ from kivy.vector import Vector
 from utility.kivy_helper import *
 from .transform_component import TransformComponent
 from .character_data import *
+from .weapon import Weapon
 from .constant import *
 
 
@@ -78,6 +79,9 @@ class Character(Scatter):
         self.updated_tile_pos = True
         self.spawn_tile_pos = Vector(tile_pos)
         self.is_player = is_player
+        
+        self.weapon = Weapon((100,0), character_data.weapon_data)
+        self.add_widget(self.weapon)
     
     def on_touch_down(inst, touch):
         # do nothing
@@ -93,6 +97,11 @@ class Character(Scatter):
     # Properties
     def is_alive(self):
         return 0 < self.properties.get_hp()
+    
+    def get_damage(self):
+        if self.weapon:
+            return self.weapon.get_damage()
+        return 10.0
     
     def set_damage(self, damage):
         self.properties.set_damage(damage)
