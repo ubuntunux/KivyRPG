@@ -6,11 +6,14 @@ from utility.kivy_helper import *
 class WeaponData():
     def __init__(self, resource_manager, name, weapon_data_info):
         self.name = name
-        image = resource_manager.get_image(weapon_data_info.get("source", ""))
-        region = weapon_data_info.get("region", (0,0,1,1))
+        
         self.texture = None
+        image = resource_manager.get_image(weapon_data_info.get("source", ""))
         if image:
+            region = weapon_data_info.get("region", (0,0,1,1))
             self.texture = get_texture_atlas(image.texture, region)
+            if weapon_data_info.get("flip_horizontal", False):
+                self.texture.flip_horizontal()
         self.damage = weapon_data_info.get("damage", 10)
         self.size = weapon_data_info.get("size", (100,100))
         self.pos = weapon_data_info.get("pos", (50,0))
