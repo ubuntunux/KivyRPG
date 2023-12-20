@@ -2,7 +2,7 @@ import os
 from kivy.logger import Logger
 from utility.singleton import SingletonInstance
 from utility.resource import ResourceManager
-from .character import CharacterData
+from .character_data import CharacterData
 from .tile import TileData, TileDataSet
 
 game_path = "KivyRPG"

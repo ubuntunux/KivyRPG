@@ -2,10 +2,10 @@
     "source": "tiles_00",
     "tile_data": {
         "grass": {
-            "region": (32, 128, 32, 32)
+            "region": (1/16, 4/16, 1/16, 1/16)
         },
         "grass_stone_lt": {
-            "region": (0, 160, 32, 32)
+            "region": (0/16, 5/16, 1/16, 1/16)
         }
     }
 }

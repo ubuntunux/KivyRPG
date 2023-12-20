@@ -1,6 +1,3 @@
-from enum import Enum
-import os
-from kivy.logger import Logger
 from kivy.graphics.transformation import Matrix
 from kivy.uix.button import Button
 from kivy.uix.image import Image
@@ -8,22 +5,9 @@ from kivy.uix.scatter import Scatter
 from kivy.uix.widget import Widget
 from kivy.vector import Vector
 from utility.kivy_helper import *
-from .behavior import *
 from .transform_component import TransformComponent
+from .character_data import *
 from .constant import *
-from .. import main
-
- 
-class ActionState(Enum):
-    IDLE = 0
-    ATTACK = 1
-
-
-class ActionData():
-    def __init__(self, character_name, action_name, texture):
-        self.action_data_path = os.path.join(character_name, action_name)
-        self.name = action_name
-        self.texture = texture
 
 
 class Action():
@@ -54,16 +38,6 @@ class Action():
             self.action_time -= dt
 
 
-class CharacterPropertyData():
-    def __init__(self, property_data):
-        self.walk_speed = 100.0
-        self.max_hp = 100.0
-        self.max_mp = 100.0
-        for (key, value) in property_data.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
-
 class CharacterProperties():
     def __init__(self, property_data):
         self.hp = 100.0
@@ -85,18 +59,6 @@ class CharacterProperties():
     
     def set_damage(self, damage):
         self.hp -= damage
-
-
-class CharacterData():
-    def __init__(self, name, src_image, character_data_info):
-        self.name = name
-        self.action_data = {}
-        action_data_infos = character_data_info.get("actions")
-        for (action_name, action_data_info) in action_data_infos.items():
-            texture = src_image.texture.get_region(*action_data_info["region"])
-            self.action_data[action_name] = ActionData(name, action_name, texture)
-        self.behavior_class = eval(character_data_info.get("behavior_class"))
-        self.property_data = CharacterPropertyData(character_data_info.get("properties", {}))
 
 
 class Character(Scatter):
