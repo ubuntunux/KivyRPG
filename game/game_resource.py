@@ -52,7 +52,7 @@ class GameResourceManager(ResourceManager):
                 
     # weapon
     def get_weapon_data(self, resource_name):
-        return self.get_resource(self.weapon_data, resource_name)
+        return self.get_resource(self.weapon_data, resource_name, WeaponData(self, resource_name, {}))
         
     def weapon_data_loader(self, name, filepath):
         if os.path.exists(filepath):

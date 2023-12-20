@@ -80,7 +80,7 @@ class Character(Scatter):
         self.spawn_tile_pos = Vector(tile_pos)
         self.is_player = is_player
         
-        self.weapon = Weapon((100,0), character_data.weapon_data)
+        self.weapon = Weapon(character_data.weapon_data)
         self.add_widget(self.weapon)
     
     def on_touch_down(inst, touch):
@@ -99,9 +99,7 @@ class Character(Scatter):
         return 0 < self.properties.get_hp()
     
     def get_damage(self):
-        if self.weapon:
-            return self.weapon.get_damage()
-        return 10.0
+        return self.weapon.get_damage()
     
     def set_damage(self, damage):
         self.properties.set_damage(damage)
@@ -128,6 +126,7 @@ class Character(Scatter):
         
     def set_attack(self):
         self.action.set_action_state(ActionState.ATTACK)
+        self.weapon.set_attack()
     
     def get_front(self):
         return self.transform_component.get_front()
@@ -159,6 +158,7 @@ class Character(Scatter):
     def update(self, actor_manager, level_manager, dt):
         self.behavior.update_behavior(actor_manager, level_manager, dt)
         self.action.update_action(dt)
+        self.weapon.update_weapon(dt)
         self.updated_pos = self.transform_component.update_transform(level_manager, dt)
         self.updated_tile_pos = self.get_prev_tile_pos() != self.get_tile_pos()
         if self.updated_pos:
