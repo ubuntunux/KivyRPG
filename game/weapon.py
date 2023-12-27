@@ -4,21 +4,7 @@ from kivy.uix.image import Image
 from kivy.uix.scatter import Scatter
 from kivy.vector import Vector
 from utility.kivy_helper import *
-
-class WeaponData():
-    def __init__(self, resource_manager, name, weapon_data_info):
-        self.name = name
-        
-        self.texture = None
-        image = resource_manager.get_image(weapon_data_info.get("source", ""))
-        if image:
-            region = weapon_data_info.get("region", (0,0,1,1))
-            self.texture = get_texture_atlas(image.texture, region)
-            if weapon_data_info.get("flip_horizontal", False):
-                self.texture.flip_horizontal()
-        self.damage = weapon_data_info.get("damage", 10)
-        self.size = weapon_data_info.get("size", (100,100))
-        self.pos = weapon_data_info.get("pos", (50,0))
+from .effect import GameEffectManager
 
 
 class Weapon(Scatter):
@@ -45,7 +31,12 @@ class Weapon(Scatter):
         self.attack_anim_time = 0.1
         self.attack_dir = Vector(attack_dir)
         self.update_weapon_transform(attack_dir, 50.0)
-    
+        if self.weapon_data.attack_effect:
+            GameEffectManager.instance().create_effect(
+                self.weapon_data.attack_effect,
+                attach_to=self.actor
+            )
+            
     def update_weapon_transform(self, attack_dir, distance):
         if abs(attack_dir.x) < abs(attack_dir.y):
             sign_y = sign(attack_dir.y)

@@ -4,7 +4,7 @@ from utility.singleton import SingletonInstance
 from utility.resource import ResourceManager
 from .character_data import CharacterData
 from .tile import TileData, TileDataSet
-from .weapon import WeaponData
+from .weapon_data import WeaponData
 
 
 game_path = "KivyRPG"
