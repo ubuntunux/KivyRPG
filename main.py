@@ -15,7 +15,7 @@ from utility.kivy_widgets import DebugLabel
 from utility.singleton import SingletonInstance
 from .game.level import LevelManager
 from .game.actor import ActorManager
-from .game.effect import FxManager
+from .game.effect import GameEffectManager
 from .game.game_controller import GameController
 from .game.game_resource import GameResourceManager
 
@@ -26,15 +26,15 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.resource_manager = GameResourceManager.instance()
         self.level_manager = LevelManager.instance(self)
         self.actor_manager = ActorManager.instance(self)
-        self.fx_manager = FxManager.instance(self)
+        self.effect_manager = GameEffectManager.instance(self)
         self.game_controller = GameController.instance(self)
         self.debug_label = None
         
     def initialize(self):
         self.resource_manager.initialize()
-        self.level_manager.initialize(self, self.actor_manager, self.fx_manager)
+        self.level_manager.initialize(self, self.actor_manager, self.effect_manager)
         self.actor_manager.initialize(self.level_manager, self.level_manager.get_character_layout())
-        self.fx_manager.initialize(self.level_manager, self.level_manager.get_effect_layout())
+        self.effect_manager.initialize(self.level_manager, self.level_manager.get_effect_layout())
         self.game_controller.initialize(self, self.level_manager, self.actor_manager)
         self.build()
         
@@ -65,7 +65,7 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.debug_label.update(dt)
         self.debug_label.pos = (0, self.height - self.debug_label.height)
         
-        self.fx_manager.update(dt)
+        self.effect_manager.update(dt)
         self.actor_manager.update(dt)
         self.level_manager.update(dt)
         

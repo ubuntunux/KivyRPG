@@ -8,15 +8,15 @@ from .game_resource import GameResourceManager
 from .constant import *
 
 
-class FxManager(EffectManager):
+class GameEffectManager(EffectManager):
     def __init__(self, app):
-        super(FxManager, self).__init__()
+        super(GameEffectManager, self).__init__()
         self.app = app
         self.level_manager = None
         
     def initialize(self, level_manager, effect_layout):
         self.level_manager = level_manager
-        super(FxManager, self).initialize(effect_layout)
+        super(GameEffectManager, self).initialize(effect_layout)
         
     def create_effect(self, effect_name, attach_to=None):
         game_resource = GameResourceManager.instance()

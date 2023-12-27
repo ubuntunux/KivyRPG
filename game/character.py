@@ -80,7 +80,7 @@ class Character(Scatter):
         self.spawn_tile_pos = Vector(tile_pos)
         self.is_player = is_player
         
-        self.weapon = Weapon(character_data.weapon_data)
+        self.weapon = Weapon(self, character_data.weapon_data)
         self.add_widget(self.weapon)
     
     def on_touch_down(inst, touch):
@@ -126,7 +126,7 @@ class Character(Scatter):
         
     def set_attack(self):
         self.action.set_action_state(ActionState.ATTACK)
-        self.weapon.set_attack()
+        self.weapon.set_attack(self.get_front())
     
     def get_front(self):
         return self.transform_component.get_front()

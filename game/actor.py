@@ -2,6 +2,7 @@ from kivy.logger import Logger
 from kivy.vector import Vector
 from utility.singleton import SingletonInstance
 from utility.kivy_helper import *
+from .effect import GameEffectManager
 from .game_resource import GameResourceManager
 from .behavior import Monster
 from .character import Character
@@ -15,8 +16,9 @@ class ActorManager(SingletonInstance):
         self.character_layout = None
         self.actors = []
         self.player = None
-        
+             
     def initialize(self, level_manager, character_layout):
+        respurce_manager = GameResourceManager.instance()
         self.level_manager = level_manager
         self.character_layout = character_layout
         
@@ -72,6 +74,11 @@ class ActorManager(SingletonInstance):
     
     def attack(self, actor, target):
         target.set_damage(actor.get_damage())
+        effect_manager = GameEffectManager.instance()
+        effect_manager.create_effect(
+            effect_name="hit",
+            attach_to=target
+        )
         
     def update(self, dt):
         # update

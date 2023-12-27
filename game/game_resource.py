@@ -8,7 +8,7 @@ from .weapon import WeaponData
 
 
 game_path = "KivyRPG"
-audios_path = os.path.join(game_path, "data/audios")
+sounds_path = os.path.join(game_path, "data/sounds")
 effects_path = os.path.join(game_path, "data/effects")
 images_path = os.path.join(game_path, "data/images")
 maps_path = os.path.join(game_path, "data/maps")
@@ -25,7 +25,11 @@ class GameResourceManager(ResourceManager):
         self.weapon_data = {}
     
     def initialize(self):
-        super().initialize(images_path, effects_path)  
+        super().initialize(
+            images_path=images_path, 
+            effects_path=effects_path,
+            sounds_path=sounds_path
+        )  
         self.register_resources(tile_data_path, [".data"], self.tile_data_set, self.tile_data_set_loader, None)
         self.register_resources(weapon_data_path, [".data"], self.weapon_data, self.weapon_data_loader, None)
         self.register_resources(character_data_path, [".data"], self.character_data, self.character_data_loader, None)
