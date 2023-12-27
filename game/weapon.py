@@ -34,7 +34,7 @@ class Weapon(Scatter):
         if self.weapon_data.attack_effect:
             GameEffectManager.instance().create_effect(
                 self.weapon_data.attack_effect,
-                attach_to=self.actor
+                attach_to=self
             )
             
     def update_weapon_transform(self, attack_dir, distance):

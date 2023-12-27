@@ -15,6 +15,7 @@ class ActorManager(SingletonInstance):
         self.level_manager = None
         self.character_layout = None
         self.actors = []
+        self.dead_characters = []
         self.player = None
              
     def initialize(self, level_manager, character_layout):
@@ -81,11 +82,16 @@ class ActorManager(SingletonInstance):
         )
         
     def update(self, dt):
+        # dead
+        for actor in self.dead_characters:
+            self.remove_actor(actor)
+
         # update
         for actor in self.actors:
             actor.update(self, self.level_manager, dt)
+        
         # interaction
-        dead_characters = []
+        self.dead_characters = []
         for actor in self.actors:
             pos = actor.get_attack_point()
             if pos is not None:
@@ -93,9 +99,5 @@ class ActorManager(SingletonInstance):
                 if actor is not target and target is not None:
                     self.attack(actor, target)
                     if not target.is_alive():
-                        dead_characters.append(target)
-        # dead
-        for actor in dead_characters:
-            self.remove_actor(actor)
-
-            
+                        self.dead_characters.append(target)
+        
