@@ -64,7 +64,7 @@ class KivyRPGApp(BaseApp, SingletonInstance):
     def update(self, dt):
         self.debug_label.update(dt)
         self.debug_label.pos = (0, self.height - self.debug_label.height)
-        
+        self.game_controller.update(dt)
         self.effect_manager.update(dt)
         self.actor_manager.update(dt)
         self.level_manager.update(dt)

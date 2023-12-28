@@ -70,8 +70,20 @@ class ActorManager(SingletonInstance):
         else:
             self.get_player().move_to(self.level_manager, tile_pos)
             
+    def callback_move(self, direction):
+        tile_pos = self.get_player().get_tile_pos()
+        if "left" == direction:
+            tile_pos = tile_pos + Vector(-1, 0)
+        elif "right" == direction:
+            tile_pos = tile_pos + Vector(1, 0)
+        elif "up" == direction:
+            tile_pos = tile_pos + Vector(0, 1)
+        elif "down" == direction:
+            tile_pos = tile_pos + Vector(0, -1)
+        self.get_player().move_to(self.level_manager, tile_pos)
+        
     def callback_attack(self, inst):
-        self.player.set_attack()
+        self.get_player().set_attack()
     
     def attack(self, actor, target):
         target.set_damage(actor.get_damage())

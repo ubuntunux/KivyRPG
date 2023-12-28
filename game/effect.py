@@ -18,15 +18,15 @@ class GameEffectManager(EffectManager):
         self.level_manager = level_manager
         super(GameEffectManager, self).initialize(effect_layout)
         
-    def create_effect(self, effect_name, attach_to=None):
+    def create_effect(self, effect_name, pos=(0,0), size=(100,100), attach_to=None):
         game_resource = GameResourceManager.instance()
         effect_data = game_resource.get_effect_data(effect_name)
         if effect_data:
             emitter = self.create_emitter(
                 emitter_name=effect_name,
                 attach_to=attach_to,
-                pos=(50,50),
-                size=(100,100),
+                pos=pos,
+                size=size,
                 effect_data=effect_data
             )
             emitter.play()
