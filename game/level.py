@@ -45,8 +45,10 @@ class LevelManager(SingletonInstance):
         self.update_layer_size(self.top_layer.size)
         
     def on_touch_down(self, inst, touch):
-        self.actor_manager.callback_touch(inst, touch)
-        return True
+        if inst.collide_point(*touch.pos):
+            self.actor_manager.callback_touch(inst, touch)
+            return True
+        return False
     
     def get_character_layout(self):
         return self.character_layer
