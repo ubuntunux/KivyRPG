@@ -20,24 +20,43 @@ class DirectionController():
         self.button_active_opacity = 0.5
         self.button_deactive_opacity = 0.2
         self.button_bounds = (10,10,210,210)
+        self.button_size = 200
+        self.dead_zone_size = 50
         self.button_neutral_pos = (
-            (self.button_bounds[0] + self.button_bounds[2]) * 0.5,
-            (self.button_bounds[1] + self.button_bounds[3]) * 0.5
+            (self.button_bounds[2] - self.button_bounds[0]) * 0.5,
+            (self.button_bounds[3] - self.button_bounds[1]) * 0.5
         )
-        self.dead_zone_size = 10
         self.button = None
         self.button_color = Color(1,1,1,1)
         self.touch_id = None
         
     def initialize(self, controller_layer):
         resource_manager = GameResourceManager.instance()
+        bound_size = (
+            self.button_bounds[2] - self.button_bounds[0] + self.button_size,
+            self.button_bounds[3] - self.button_bounds[1] + self.button_size
+        )
+        self.bound = Widget(
+            pos=(self.button_bounds[0], self.button_bounds[1]),
+            size_hint=(None, None),
+            size=bound_size
+        )
+        self.bound.bind(
+            on_touch_down=self.on_touch_down,
+            on_touch_move=self.on_touch_move,
+            on_touch_up=self.on_touch_up
+        )
+        with self.bound.canvas:
+            Color(1,1,1, self.button_deactive_opacity)
+            Rectangle(size=self.bound.size)
+        
         self.button = Scatter(
             do_rotation=False,
             do_scale=False,
             do_translation=False,
             pos=self.button_neutral_pos,
             size_hint=(None, None),
-            size=(200, 200)
+            size=(self.button_size, self.button_size)
         )
         self.button.bind(
             on_touch_down=self.on_touch_down,
@@ -56,7 +75,8 @@ class DirectionController():
             img = Image(texture=point.texture, pos=img_pos, size=img_size, keep_ratio=False, allow_stretch=True)
             self.button.add_widget(img)
       
-        controller_layer.add_widget(self.button)
+        self.bound.add_widget(self.button)
+        controller_layer.add_widget(self.bound)
         
     def on_touch_down(self, inst, touch):
         if self.touch_id is None and inst.collide_point(*touch.pos):
@@ -86,8 +106,8 @@ class DirectionController():
     def set_button_pos(self, pos):
         bounds = self.button_bounds
         self.button.pos = (
-            max(bounds[0], min(bounds[2], pos[0])),
-            max(bounds[1], min(bounds[3], pos[1]))
+            max(0, min(bounds[2] - bounds[0], pos[0])),
+            max(0, min(bounds[3] - bounds[1], pos[1]))
         )
         
     def update(self, dt):
