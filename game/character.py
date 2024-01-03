@@ -159,7 +159,7 @@ class Character(Scatter):
     def update(self, actor_manager, level_manager, dt):
         self.behavior.update_behavior(actor_manager, level_manager, dt)
         self.action.update_action(dt)
-        self.weapon.update_weapon(dt)
+        self.weapon.update_weapon(dt, self.get_front())
         self.updated_pos = self.transform_component.update_transform(level_manager, dt)
         self.updated_tile_pos = self.get_prev_tile_pos() != self.get_tile_pos()
         if self.updated_pos:
