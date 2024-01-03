@@ -19,12 +19,13 @@ class DirectionController():
         self.game_controller = game_controller
         self.button_active_opacity = 0.5
         self.button_deactive_opacity = 0.2
-        self.button_bounds = (10,10,210,210)
         self.button_size = 200
+        self.bound_size = self.button_size + 200
+        self.bound_offset = 20
         self.dead_zone_size = 50
         self.button_neutral_pos = (
-            (self.button_bounds[2] - self.button_bounds[0]) * 0.5,
-            (self.button_bounds[3] - self.button_bounds[1]) * 0.5
+            self.bound_offset + self.bound_size * 0.5,
+            self.bound_offset + self.bound_size * 0.5
         )
         self.button = None
         self.button_color = Color(1,1,1,1)
@@ -32,14 +33,14 @@ class DirectionController():
         
     def initialize(self, controller_layer):
         resource_manager = GameResourceManager.instance()
-        bound_size = (
-            self.button_bounds[2] - self.button_bounds[0] + self.button_size,
-            self.button_bounds[3] - self.button_bounds[1] + self.button_size
-        )
-        self.bound = Widget(
-            pos=(self.button_bounds[0], self.button_bounds[1]),
+        # button bound
+        self.bound = Scatter(
+            do_rotation=False,
+            do_scale=False,
+            do_translation=False,
+            pos=(self.bound_offset, self.bound_offset),
             size_hint=(None, None),
-            size=bound_size
+            size=(self.bound_size, self.bound_size)
         )
         self.bound.bind(
             on_touch_down=self.on_touch_down,
@@ -50,23 +51,21 @@ class DirectionController():
             Color(1,1,1, self.button_deactive_opacity)
             Rectangle(size=self.bound.size)
         
+        # button
+        button_size = (self.button_size, self.button_size)
         self.button = Scatter(
             do_rotation=False,
             do_scale=False,
             do_translation=False,
-            pos=self.button_neutral_pos,
+            pos=mul(sub(self.bound.size, button_size), 0.5),
             size_hint=(None, None),
-            size=(self.button_size, self.button_size)
-        )
-        self.button.bind(
-            on_touch_down=self.on_touch_down,
-            on_touch_move=self.on_touch_move,
-            on_touch_up=self.on_touch_up
+            size=button_size
         )
         with self.button.canvas:
             self.button_color = Color(1,1,1, self.button_deactive_opacity)
             Rectangle(size=self.button.size)
         
+        # button image
         add_image = False
         if add_image:
             point = resource_manager.get_image("point")
@@ -94,25 +93,22 @@ class DirectionController():
         
     def on_touch_up(self, inst, touch):
         if self.touch_id == touch.id:
-            self.set_button_pos(self.button_neutral_pos)
+            self.set_button_center(self.button_neutral_pos)
             self.button_color.a = self.button_deactive_opacity
             self.touch_id = None
             return True
         return False
     
     def set_button_center(self, pos):
-        self.set_button_pos(sub(pos, mul(self.button.size, 0.5)))
-    
-    def set_button_pos(self, pos):
-        bounds = self.button_bounds
+        new_pos = sub(self.bound.to_local(*pos), self.button_size * 0.5)
         self.button.pos = (
-            max(0, min(bounds[2] - bounds[0], pos[0])),
-            max(0, min(bounds[3] - bounds[1], pos[1]))
+            max(0, min(self.bound.size[0] - self.button.size[0], new_pos[0])),
+            max(0, min(self.bound.size[1] - self.button.size[1], new_pos[1]))
         )
         
     def update(self, dt):
         if self.touch_id is not None:
-            diff = sub(self.button.pos, self.button_neutral_pos)
+            diff = sub(add(self.bound.pos, self.button.center), self.button_neutral_pos)
             mag_x = max(0, abs(diff[0]) - self.dead_zone_size)
             mag_y = max(0, abs(diff[1]) - self.dead_zone_size)
             direction = None
@@ -126,7 +122,7 @@ class DirectionController():
                     direction = "right"
                 else:
                     direction = "left"
-            log_info((diff, direction))
+
             if direction:
                 self.game_controller.pressed_direction(direction)
         
@@ -147,6 +143,10 @@ class GameController(SingletonInstance):
         # attack button
         btn = Button(text="Attack", pos_hint={"right":1}, size_hint=(None, None), size=(300, 300), opacity=0.5)
         btn.bind(on_press=actor_manager.callback_attack)
+        self.controller_layer.add_widget(btn)
+        
+        btn = Button(text="Reset", pos_hint={"right":1, "top":1}, size_hint=(None, None), size=(300, 150), opacity=0.5)
+        btn.bind(on_press=level_manager.callback_reset_level)
         self.controller_layer.add_widget(btn)
         
         parent_widget.add_widget(self.controller_layer)

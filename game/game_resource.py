@@ -28,7 +28,10 @@ class GameResourceManager(ResourceManager):
         super().initialize(
             images_path=images_path, 
             effects_path=effects_path,
-            sounds_path=sounds_path
+            sounds_path=sounds_path,
+            preload_images=False,
+            preload_effects=False,
+            preload_sounds=False
         )  
         self.register_resources(tile_data_path, [".data"], self.tile_data_set, self.tile_data_set_loader, None)
         self.register_resources(weapon_data_path, [".data"], self.weapon_data, self.weapon_data_loader, None)

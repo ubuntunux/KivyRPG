@@ -67,7 +67,7 @@ class Character(Scatter):
         super().__init__(size=size)
         
         self.action = Action(character_data.action_data)
-        self.image = Image(size=size, keep_ratio=False, allow_stretch=True)
+        self.image = Image(size=size, fit_mode="fill")
         self.image.texture = self.action.get_current_texture()
         self.add_widget(self.image)
         
@@ -106,8 +106,9 @@ class Character(Scatter):
         
     # Transform
     def move_to(self, level_manager, tile_pos):
-        self.transform_component.trace_actor(level_manager, None)
-        self.transform_component.move_to(level_manager, tile_pos)
+        if level_manager.is_in_level(tile_pos):
+            self.transform_component.trace_actor(level_manager, None)
+            self.transform_component.move_to(level_manager, tile_pos)
     
     def trace_actor(self, level_manager, actor):
         self.transform_component.trace_actor(level_manager, actor)

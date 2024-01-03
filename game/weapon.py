@@ -11,7 +11,7 @@ class Weapon(Scatter):
     def __init__(self, actor, weapon_data):
         super().__init__(pos=weapon_data.pos, size=weapon_data.size)
         self.weapon_data = weapon_data
-        self.image = Image(size=weapon_data.size, keep_ratio=False, allow_stretch=True)
+        self.image = Image(size=weapon_data.size, fit_mode="fill")
         self.image.texture = weapon_data.texture
         self.add_widget(self.image)
         

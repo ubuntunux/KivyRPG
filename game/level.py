@@ -14,11 +14,14 @@ from .constant import *
 
 class LevelManager(SingletonInstance):
     def __init__(self, app):
+        self.level_name = ""
         self.tile_map = None
         self.character_layer = None
         self.effect_layout = None
         self.top_layer = None
         self.scroll_view = None
+        self.goal_scroll_x = -1
+        self.goal_scroll_y = -1
         self.tiles = []
         self.actors = []
         self.actor_map = {}
@@ -35,7 +38,7 @@ class LevelManager(SingletonInstance):
         self.character_layer = Widget(size_hint=(None, None))
         self.effect_layer = Widget(size_hint=(None, None))
         self.top_layer = Widget(size_hint=(None, None))
-        self.scroll_view = ScrollView(size_hint=(1,1))
+        self.scroll_view = ScrollView(do_scroll=False, size_hint=(1,1))
         # link
         self.top_layer.add_widget(self.tile_map)
         self.top_layer.add_widget(self.character_layer)
@@ -110,7 +113,6 @@ class LevelManager(SingletonInstance):
         self.effect_layer.size = layer_size
         self.character_layer.size = layer_size
         
-    
     def reset_tiles(self):
         self.actor_map.clear()
         self.actors.clear()
@@ -127,8 +129,9 @@ class LevelManager(SingletonInstance):
       
     def generate_tile_map(self, level_name):
         self.reset_tiles()
-        self.num_x = 16
-        self.num_y = 16
+        self.level_name = level_name
+        self.num_x = 30
+        self.num_y = 30
         num_tiles = self.num_x * self.num_y
         self.actors = [None for i in range(num_tiles)]
         
@@ -171,5 +174,21 @@ class LevelManager(SingletonInstance):
         self.generate_tile_map(level_name)
         self.actor_manager.create_actors()
         
+    def clear_level(self):
+        self.actor_manager.clear_actors()
+        self.reset_tiles()
+        
+    def callback_reset_level(self, inst):
+        self.clear_level()
+        self.open_level(self.level_name)
+        
     def update(self, dt):
-        pass
+        player = self.actor_manager.get_player()
+        if player and player.is_alive():
+            pos = player.get_pos()
+            half_window = mul(Window.size, 0.5)
+            scroll_x = (pos[0] - half_window[0]) / (self.tile_map.width - 1.0 - Window.size[0])
+            scroll_y = (pos[1] - half_window[1]) / (self.tile_map.height - 1.0 - Window.size[1])
+            self.scroll_view.scroll_x = min(1.0, max(0.0, scroll_x))
+            self.scroll_view.scroll_y = min(1.0, max(0.0, scroll_y))
+            
