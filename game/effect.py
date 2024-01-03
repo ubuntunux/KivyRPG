@@ -18,7 +18,7 @@ class GameEffectManager(EffectManager):
         self.level_manager = level_manager
         super(GameEffectManager, self).initialize(effect_layout)
         
-    def create_effect(self, effect_name, pos=(0,0), size=(100,100), attach_to=None):
+    def create_effect(self, effect_name, pos=(0,0), rotation=0, size=(100,100), flip_x=False, flip_y=False, attach_to=None):
         game_resource = GameResourceManager.instance()
         effect_data = game_resource.get_effect_data(effect_name)
         if effect_data:
@@ -26,7 +26,10 @@ class GameEffectManager(EffectManager):
                 emitter_name=effect_name,
                 attach_to=attach_to,
                 pos=pos,
+                rotation=rotation,
                 size=size,
+                flip_x=flip_x,
+                flip_y=flip_y,
                 effect_data=effect_data
             )
             emitter.play()

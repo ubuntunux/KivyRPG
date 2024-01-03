@@ -40,8 +40,20 @@ class Weapon(Scatter):
         self.attack_anim_time = 0.1
         self.set_attack_dir(attack_dir, force_update=True)
         if self.weapon_data.attack_effect:
+            pos = Vector(self.pos)
+            rotation=self.rotation
+            is_actor_flip_x = self.actor.get_direction_x() < 0
+            effect_size=(100, 100)
+            if is_actor_flip_x:
+                pos.x = -pos.x - effect_size[0]
+                if abs(self.attack_dir.x) < abs(self.attack_dir.y):
+                    rotation += 180
             GameEffectManager.instance().create_effect(
                 self.weapon_data.attack_effect,
+                pos=pos,
+                size=effect_size,
+                rotation=rotation,
+                flip_x=is_actor_flip_x,
                 attach_to=self
             )
             
