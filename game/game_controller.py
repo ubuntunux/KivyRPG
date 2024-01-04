@@ -145,7 +145,8 @@ class GameController(SingletonInstance):
         btn.bind(on_press=actor_manager.callback_attack)
         self.controller_layer.add_widget(btn)
         
-        btn = Button(text="Reset", pos_hint={"right":1, "top":1}, size_hint=(None, None), size=(300, 150), opacity=0.5)
+        # reset level
+        btn = Button(text="Reset Level", pos_hint={"right":1, "top":1}, size_hint=(None, None), size=(300, 150), opacity=0.5)
         btn.bind(on_press=level_manager.callback_reset_level)
         self.controller_layer.add_widget(btn)
         

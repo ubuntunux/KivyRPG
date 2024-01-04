@@ -15,7 +15,7 @@ from .constant import *
 class LevelManager(SingletonInstance):
     def __init__(self, app):
         self.level_name = ""
-        self.tile_map = None
+        self.tile_map_widget = None
         self.character_layer = None
         self.effect_layout = None
         self.top_layer = None
@@ -29,18 +29,19 @@ class LevelManager(SingletonInstance):
         self.actor_manager = None
         self.num_x = 16
         self.num_y = 16
+        self.num_tiles = self.num_x * self.num_y
         
     def initialize(self, parent_widget, actor_manager, fx_manager):
         self.actor_manager = actor_manager
         self.fx_manager = fx_manager
-        self.tile_map = Widget(size_hint=(None, None))
-        self.tile_map.bind(on_touch_down=self.on_touch_down)
+        self.tile_map_widget = Widget(size_hint=(None, None))
+        self.tile_map_widget.bind(on_touch_down=self.on_touch_down)
         self.character_layer = Widget(size_hint=(None, None))
         self.effect_layer = Widget(size_hint=(None, None))
         self.top_layer = Widget(size_hint=(None, None))
         self.scroll_view = ScrollView(do_scroll=False, size_hint=(1,1))
         # link
-        self.top_layer.add_widget(self.tile_map)
+        self.top_layer.add_widget(self.tile_map_widget)
         self.top_layer.add_widget(self.character_layer)
         self.top_layer.add_widget(self.effect_layer)
         self.scroll_view.add_widget(self.top_layer)
@@ -113,13 +114,6 @@ class LevelManager(SingletonInstance):
         self.effect_layer.size = layer_size
         self.character_layer.size = layer_size
         
-    def reset_tiles(self):
-        self.actor_map.clear()
-        self.actors.clear()
-        self.tiles.clear()
-        self.tile_map.clear_widgets()
-        self.character_layer.clear_widgets()
-    
     def create_tile(self, tile_set_name, tile_name, tile_pos):
         tile_data_set = GameResourceManager.instance().get_tile_data_set(tile_set_name)  
         if tile_data_set:
@@ -128,12 +122,11 @@ class LevelManager(SingletonInstance):
                 return Tile(tile_data, tile_pos)
       
     def generate_tile_map(self, level_name):
-        self.reset_tiles()
         self.level_name = level_name
         self.num_x = 30
         self.num_y = 30
-        num_tiles = self.num_x * self.num_y
-        self.actors = [None for i in range(num_tiles)]
+        self.num_tiles = self.num_x * self.num_y
+        self.actors = [None for i in range(self.num_tiles)]
         
         texture_size = 32
         stride = 4
@@ -145,9 +138,9 @@ class LevelManager(SingletonInstance):
         texture = Texture.create(size=(width, height), colorfmt='rgba')
         data = ([int(255) for x in range(texture_data_size)])
         # set layout
-        self.tile_map.width = self.num_x * TILE_WIDTH
-        self.tile_map.height = self.num_y * TILE_HEIGHT
-        self.update_layer_size(self.tile_map.size)
+        self.tile_map_widget.width = self.num_x * TILE_WIDTH
+        self.tile_map_widget.height = self.num_y * TILE_HEIGHT
+        self.update_layer_size(self.tile_map_widget.size)
         for y in range(self.num_y):
             tiles = []
             for x in range(self.num_x):
@@ -167,28 +160,40 @@ class LevelManager(SingletonInstance):
             self.tiles.append(tiles)
         data = bytes(data)
         texture.blit_buffer(data, colorfmt='rgba', bufferfmt='ubyte')
-        with self.tile_map.canvas:
-            Rectangle(texture=texture, size=self.tile_map.size)
+        with self.tile_map_widget.canvas:
+            Rectangle(texture=texture, size=self.tile_map_widget.size)
         
     def open_level(self, level_name):
+        self.close_level()
         self.generate_tile_map(level_name)
         self.actor_manager.create_actors()
         
-    def clear_level(self):
+    def close_level(self):
+        self.clear_level_actors()
+        self.tiles.clear()
+        self.tile_map_widget.clear_widgets()
+
+    def clear_level_actors(self):
+        for i in range(len(self.actors)):
+            self.actors[i] = None
+        self.actor_map.clear()
         self.actor_manager.clear_actors()
-        self.reset_tiles()
+        self.character_layer.clear_widgets()
+    
+    def reset_level(self):
+        self.clear_level_actors()
+        self.actor_manager.create_actors()
         
     def callback_reset_level(self, inst):
-        self.clear_level()
-        self.open_level(self.level_name)
+        self.reset_level()
         
     def update(self, dt):
         player = self.actor_manager.get_player()
         if player and player.is_alive():
             pos = player.get_pos()
             half_window = mul(Window.size, 0.5)
-            scroll_x = (pos[0] - half_window[0]) / (self.tile_map.width - 1.0 - Window.size[0])
-            scroll_y = (pos[1] - half_window[1]) / (self.tile_map.height - 1.0 - Window.size[1])
+            scroll_x = (pos[0] - half_window[0]) / (self.tile_map_widget.width - 1.0 - Window.size[0])
+            scroll_y = (pos[1] - half_window[1]) / (self.tile_map_widget.height - 1.0 - Window.size[1])
             self.scroll_view.scroll_x = min(1.0, max(0.0, scroll_x))
             self.scroll_view.scroll_y = min(1.0, max(0.0, scroll_y))
             

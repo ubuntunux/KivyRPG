@@ -22,7 +22,7 @@ from .game.game_resource import GameResourceManager
 
 class KivyRPGApp(BaseApp, SingletonInstance):
     def __init__(self, app_name):
-        super(KivyRPGApp, self).__init__(app_name)
+        super(KivyRPGApp, self).__init__(app_name, orientation="landscape")
         self.resource_manager = GameResourceManager.instance()
         self.level_manager = LevelManager.instance(self)
         self.actor_manager = ActorManager.instance(self)

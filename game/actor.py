@@ -124,7 +124,7 @@ class ActorManager(SingletonInstance):
                     attach_to=attack_info.target
                 )
                 if not attack_info.target.is_alive():
-                    self.dead_characters.append(actor)
+                    self.dead_characters.append(attack_info.target)
         self.attack_infos = []
         
             
