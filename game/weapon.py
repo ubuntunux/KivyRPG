@@ -39,19 +39,33 @@ class Weapon(Scatter):
     def set_attack(self, attack_dir):
         self.attack_anim_time = 0.1
         self.set_attack_dir(attack_dir, force_update=True)
+        self.create_attack_effect(attack_dir)
+        
+    def create_attack_effect(self, attack_dir):
         if self.weapon_data.attack_effect:
-            pos = Vector(self.pos)
+            pos = Vector(self.center)
             rotation=self.rotation
+            size=(100, 100)
             is_actor_flip_x = self.actor.get_direction_x() < 0
-            effect_size=(100, 100)
+            is_dir_vertical = abs(attack_dir.x) < abs(attack_dir.y)
+            offset = 50.0
+            
+            # adjust offset
+            if is_dir_vertical:
+                pos.y = pos.y - offset * sign(attack_dir.y)    
+            else:
+                pos.x -= offset
+             
+             # adjust flip   
             if is_actor_flip_x:
-                pos.x = -pos.x - effect_size[0]
-                if abs(self.attack_dir.x) < abs(self.attack_dir.y):
+                pos.x = -pos.x
+                if is_dir_vertical:
                     rotation += 180
+                 
             GameEffectManager.instance().create_effect(
                 self.weapon_data.attack_effect,
-                pos=pos,
-                size=effect_size,
+                center=pos,
+                size=size,
                 rotation=rotation,
                 flip_x=is_actor_flip_x,
                 attach_to=self

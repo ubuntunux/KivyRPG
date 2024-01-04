@@ -15,7 +15,7 @@
     "play_speed":1.0,
     "color":(1,1,1,1),
     "delay":RangeVar(0.0), 
-    "life_time":RangeVar(1.0), 
+    "life_time":RangeVar(0.3), 
     "gravity":RangeVar(0),
     "velocity":RangeVar([0, 0]),
     "angular_velocity":RangeVar(0), 
