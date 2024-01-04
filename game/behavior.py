@@ -34,6 +34,10 @@ class Player(Behavior):
 
 
 class Monster(Behavior):
+    def __init__(self, actor):
+        super().__init__(actor)
+        self.attack_time = 1.0
+
     def set_behavior_state(self, behavior_state, behavior_time=1.0):
         super().set_behavior_state(behavior_state, behavior_time)
         if behavior_state == BehaviorState.ROAMING:
@@ -50,7 +54,14 @@ class Monster(Behavior):
                 self.set_behavior_state(BehaviorState.IDLE)
         
         if self.actor.get_updated_tile_pos():
-            tile_pos = actor_manager.get_player().get_tile_pos()
-            self.actor.move_to(level_manager, tile_pos)
+            target_tile_pos = actor_manager.get_player().get_tile_pos()
+            self.actor.move_to(target_tile_pos)
+        
+        if self.attack_time < 0:
+            self.actor.set_attack()
+            self.attack_time = 1.0
+        else:
+            self.attack_time -= dt
+        
         self.behavior_time -= dt
             

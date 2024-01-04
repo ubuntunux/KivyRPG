@@ -16,13 +16,20 @@ class Action():
         self.action_data = action_data
         self.action_state = ActionState.IDLE
         self.action_time = 0.0
-    
+        self.action_time_map = {
+            ActionState.IDLE: 0,
+            ActionState.ATTACK: 0.1
+        }
+   
+    def is_action_state(self, action_state):
+        return self.action_state == action_state
+     
     def get_action_state(self):
         return self.action_state
     
-    def set_action_state(self, action_state, action_time=0):
+    def set_action_state(self, action_state):
         self.action_state = action_state
-        self.action_time = action_time
+        self.action_time = self.action_time_map.get(action_state, 1.0)
         
     def get_current_texture(self):
         action_data = self.action_data.get("idle")
@@ -34,11 +41,8 @@ class Action():
         if ActionState.IDLE != self.action_state:
             if self.action_time < 0:
                 self.set_action_state(ActionState.IDLE)
-        
-        if 0 <= self.action_time:
             self.action_time -= dt
-
-
+        
 class CharacterProperties():
     def __init__(self, property_data):
         self.hp = 100.0
@@ -63,9 +67,18 @@ class CharacterProperties():
 
 
 class Character(Scatter):
+    actor_manager = None
+    level_manager = None
+    effect_manager = None
+    
+    @classmethod
+    def set_managers(cls, actor_manager, level_manager, effect_manager):
+        cls.actor_manager = actor_manager
+        cls.level_manager = level_manager
+        cls.effect_manager = effect_manager
+    
     def __init__(self, character_data, tile_pos, size, is_player):
         super().__init__(size=size)
-        
         self.action = Action(character_data.action_data)
         self.image = Image(size=size, fit_mode="fill")
         self.image.texture = self.action.get_current_texture()
@@ -93,41 +106,15 @@ class Character(Scatter):
             post_multiply=True,
             anchor=self.to_local(*self.center)
         )
-        
-    # Properties
-    def is_alive(self):
-        return 0 < self.properties.get_hp()
-    
-    def get_damage(self):
-        return self.weapon.get_damage()
-    
-    def set_damage(self, damage):
-        self.properties.set_damage(damage)
-        
-    # Transform
-    def move_to(self, level_manager, tile_pos):
-        if level_manager.is_in_level(tile_pos):
-            self.transform_component.trace_actor(level_manager, None)
-            self.transform_component.move_to(level_manager, tile_pos)
-    
-    def trace_actor(self, level_manager, actor):
-        self.transform_component.trace_actor(level_manager, actor)
-         
+                 
     def get_spawn_tile_pos(self):
         return self.spawn_tile_pos
     
     def set_spawn_tile_pos(self, spawn_tile_pos):
         self.spawn_tile_pos = Vector(spawn_tile_pos)
         
-    # Actions
-    def get_attack_point(self):
-        if ActionState.ATTACK == self.action.get_action_state():
-            return get_next_tile_pos(self.get_tile_pos(), self.get_front())
-        return None
-        
-    def set_attack(self):
-        self.action.set_action_state(ActionState.ATTACK)
-        self.weapon.set_attack(self.get_front())
+    def get_front_tile_pos(self):
+        return get_next_tile_pos(self.get_tile_pos(), self.get_front())
     
     def get_front(self):
         return self.transform_component.get_front()
@@ -156,11 +143,41 @@ class Character(Scatter):
     def get_updated_tile_pos(self):
         return self.updated_tile_pos
     
-    def update(self, actor_manager, level_manager, dt):
-        self.behavior.update_behavior(actor_manager, level_manager, dt)
+    # Properties
+    def is_alive(self):
+        return 0 < self.properties.get_hp()
+    
+    def get_damage(self):
+        return self.weapon.get_damage()
+    
+    def set_damage(self, damage):
+        self.properties.set_damage(damage)
+        
+    # Transform
+    def move_to(self, tile_pos):
+        if self.level_manager.is_in_level(tile_pos):
+            self.transform_component.trace_actor(self.level_manager, None)
+            self.transform_component.move_to(self.level_manager, tile_pos)
+    
+    def trace_actor(self, actor):
+        self.transform_component.trace_actor(self.level_manager, actor)
+
+    # Actions    
+    def set_attack(self):
+        if not self.action.is_action_state(ActionState.ATTACK):
+            self.action.set_action_state(ActionState.ATTACK)
+            self.weapon.set_attack(self.get_front())
+            target = self.level_manager.get_actor(self.get_front_tile_pos())
+            log_info((target, target is not self))
+            if target and target is not self:
+                damage = self.get_damage()
+                self.actor_manager.regist_attack_info(self, target, damage)
+    
+    def update(self, dt):
+        self.behavior.update_behavior(self.actor_manager, self.level_manager, dt)
         self.action.update_action(dt)
         self.weapon.update_weapon(dt, self.get_front())
-        self.updated_pos = self.transform_component.update_transform(level_manager, dt)
+        self.updated_pos = self.transform_component.update_transform(self.level_manager, dt)
         self.updated_tile_pos = self.get_prev_tile_pos() != self.get_tile_pos()
         if self.updated_pos:
             self.center = self.transform_component.get_pos()

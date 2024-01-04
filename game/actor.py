@@ -9,6 +9,13 @@ from .character import Character
 from .constant import *
 
 
+class AttackInfo():
+    def __init__(self, actor, target, damage):
+        self.actor = actor
+        self.target = target
+        self.damage = damage
+        
+    
 class ActorManager(SingletonInstance):
     def __init__(self, app):
         self.app = app
@@ -16,12 +23,18 @@ class ActorManager(SingletonInstance):
         self.character_layout = None
         self.actors = []
         self.dead_characters = []
+        self.attack_infos = []
         self.player = None
              
     def initialize(self, level_manager, character_layout):
         respurce_manager = GameResourceManager.instance()
         self.level_manager = level_manager
         self.character_layout = character_layout
+        Character.set_managers(
+            actor_manager=self, 
+            level_manager=self.level_manager,
+            effect_manager=GameEffectManager.instance()
+        )
         
     def get_player(self):
         return self.player
@@ -66,9 +79,9 @@ class ActorManager(SingletonInstance):
         tile_pos = pos_to_tile(touch.pos)
         actor = self.level_manager.get_actor(tile_pos)
         if actor is not None:
-            self.get_player().trace_actor(self.level_manager, actor)
+            self.get_player().trace_actor(actor)
         else:
-            self.get_player().move_to(self.level_manager, tile_pos)
+            self.get_player().move_to(tile_pos)
             
     def callback_move(self, direction):
         tile_pos = self.get_player().get_tile_pos()
@@ -80,36 +93,38 @@ class ActorManager(SingletonInstance):
             tile_pos = tile_pos + Vector(0, 1)
         elif "down" == direction:
             tile_pos = tile_pos + Vector(0, -1)
-        self.get_player().move_to(self.level_manager, tile_pos)
+        self.get_player().move_to(tile_pos)
         
     def callback_attack(self, inst):
-        self.get_player().set_attack()
-    
-    def attack(self, actor, target):
-        target.set_damage(actor.get_damage())
-        effect_manager = GameEffectManager.instance()
-        effect_manager.create_effect(
-            effect_name="hit",
-            attach_to=target
-        )
+        self.get_player().set_attack()   
         
+    def regist_attack_info(self, actor, target, damage):
+        self.attack_infos.append(AttackInfo(actor, target, damage))
+    
     def update(self, dt):
+        effect_manager = GameEffectManager.instance()
         # dead
         for actor in self.dead_characters:
             self.remove_actor(actor)
+        self.dead_characters = []
 
         # update
         for actor in self.actors:
-            actor.update(self, self.level_manager, dt)
+            if actor.is_alive():
+                actor.update(dt)
+            else:
+               self.dead_characters.append(actor)
         
-        # interaction
-        self.dead_characters = []
-        for actor in self.actors:
-            pos = actor.get_attack_point()
-            if pos is not None:
-                target = self.level_manager.get_actor(pos)
-                if actor is not target and target is not None:
-                    self.attack(actor, target)
-                    if not target.is_alive():
-                        self.dead_characters.append(target)
+        # attack infos
+        for attack_info in self.attack_infos:
+            if attack_info.target and attack_info.target.is_alive():
+                attack_info.target.set_damage(attack_info.damage)
+                effect_manager.create_effect(
+                    effect_name="hit",
+                    attach_to=attack_info.target
+                )
+                if not attack_info.target.is_alive():
+                    self.dead_characters.append(actor)
+        self.attack_infos = []
         
+            
