@@ -11,6 +11,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 
 from app.app import BaseApp, MainApp
+from utility.kivy_helper import *
 from utility.kivy_widgets import DebugLabel
 from utility.singleton import SingletonInstance
 from .game.level import LevelManager
@@ -43,6 +44,9 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.level_manager.open_level("default")
         
     def on_stop(self):
+        pass
+        
+    def on_resize(self, window, width, height):
         pass
         
     def build(self):
