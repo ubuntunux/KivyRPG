@@ -75,4 +75,3 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.actor_manager.update(dt)
         self.level_manager.update(dt)
         
-        
