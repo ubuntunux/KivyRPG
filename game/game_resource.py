@@ -7,35 +7,33 @@ from .tile import TileData, TileDataSet
 from .weapon_data import WeaponData
 
 
-game_path = "KivyRPG"
-sounds_path = os.path.join(game_path, "data/sounds")
-effects_path = os.path.join(game_path, "data/effects")
-images_path = os.path.join(game_path, "data/images")
-maps_path = os.path.join(game_path, "data/maps")
-tile_data_path = os.path.join(game_path, "data/tiles")
-character_data_path = os.path.join(game_path, "data/characters")
-weapon_data_path = os.path.join(game_path, "data/weapons")
- 
-
 class GameResourceManager(ResourceManager):
-    def __init__(self):
+    def __init__(self, game_path):
         super(GameResourceManager, self).__init__()
         self.tile_data_set = {}
         self.character_data = {}
         self.weapon_data = {}
+        
+        self.sounds_path = os.path.join(game_path, "data/sounds")
+        self.effects_path = os.path.join(game_path, "data/effects")
+        self.images_path = os.path.join(game_path, "data/images")
+        self.maps_path = os.path.join(game_path, "data/maps")
+        self.tile_data_path = os.path.join(game_path, "data/tiles")
+        self.character_data_path = os.path.join(game_path, "data/characters")
+        self.weapon_data_path = os.path.join(game_path, "data/weapons")
     
     def initialize(self):
         super().initialize(
-            images_path=images_path, 
-            effects_path=effects_path,
-            sounds_path=sounds_path,
+            images_path=self.images_path, 
+            effects_path=self.effects_path,
+            sounds_path=self.sounds_path,
             preload_images=False,
             preload_effects=False,
             preload_sounds=False
         )  
-        self.register_resources(tile_data_path, [".data"], self.tile_data_set, self.tile_data_set_loader, None)
-        self.register_resources(weapon_data_path, [".data"], self.weapon_data, self.weapon_data_loader, None)
-        self.register_resources(character_data_path, [".data"], self.character_data, self.character_data_loader, None)
+        self.register_resources(self.tile_data_path, [".data"], self.tile_data_set, self.tile_data_set_loader, None)
+        self.register_resources(self.weapon_data_path, [".data"], self.weapon_data, self.weapon_data_loader, None)
+        self.register_resources(self.character_data_path, [".data"], self.character_data, self.character_data_loader, None)
         
     def destroy(self):
         super().destroy()

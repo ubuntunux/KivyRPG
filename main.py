@@ -26,7 +26,8 @@ class KivyRPGApp(BaseApp, SingletonInstance):
     
     def __init__(self):
         super(KivyRPGApp, self).__init__(orientation="landscape")
-        self.resource_manager = GameResourceManager.instance()
+        game_path = os.path.split(__file__)[0]
+        self.resource_manager = GameResourceManager.instance(game_path)
         self.level_manager = LevelManager.instance(self)
         self.actor_manager = ActorManager.instance(self)
         self.effect_manager = GameEffectManager.instance(self)
@@ -75,3 +76,6 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.actor_manager.update(dt)
         self.level_manager.update(dt)
         
+
+def main(*args, **kargs):
+    return KivyRPGApp.instance(*args, **kargs)
