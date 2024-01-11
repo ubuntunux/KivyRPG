@@ -10,10 +10,11 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 
-from app.app import BaseApp, MainApp
+from core.base_app import BaseApp
 from utility.kivy_helper import *
 from utility.kivy_widgets import DebugLabel
 from utility.singleton import SingletonInstance
+
 from .game.level import LevelManager
 from .game.actor import ActorManager
 from .game.effect import GameEffectManager
