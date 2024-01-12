@@ -168,7 +168,6 @@ class Character(Scatter):
             self.action.set_action_state(ActionState.ATTACK)
             self.weapon.set_attack(self.get_front())
             target = self.level_manager.get_actor(self.get_front_tile_pos())
-            log_info((target, target is not self))
             if target and target is not self:
                 damage = self.get_damage()
                 self.actor_manager.regist_attack_info(self, target, damage)
