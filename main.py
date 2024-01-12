@@ -4,6 +4,7 @@ import traceback
 
 from kivy.config import Config
 from kivy.clock import Clock
+from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.scrollview import ScrollView
@@ -53,12 +54,12 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         
     def build(self):
         self.debug_label = DebugLabel(
-            pos=(0, self.height),
+            pos=(0, Window.height),
             text="debug", 
             halign='left',
             font_size="12sp",
             size_hint=(None, None),
-            width=self.width,
+            width=Window.width,
             display_count=40,
             display_time=20
         )
@@ -71,7 +72,7 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         
     def update(self, dt):
         self.debug_label.update(dt)
-        self.debug_label.pos = (0, self.height - self.debug_label.height)
+        self.debug_label.pos = (0, Window.height - self.debug_label.height)
         self.game_controller.update(dt)
         self.effect_manager.update(dt)
         self.actor_manager.update(dt)
