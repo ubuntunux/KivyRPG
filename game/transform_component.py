@@ -2,7 +2,6 @@ from kivy.logger import Logger
 from kivy.vector import Vector
 from utility.kivy_helper import *
 from .constant import *
-from .. import main
 
 
 class TransformComponent():
@@ -16,7 +15,6 @@ class TransformComponent():
         self.front = Vector(1, 0)
         self.target_positions = []
         self.grid_based_movement = True
-        self.logger = main.KivyRPGApp.instance()
         self.properties = properties
         
     def get_pos(self):

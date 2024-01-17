@@ -13,8 +13,8 @@ from kivy.uix.widget import Widget
 
 from core.base_app import BaseApp
 from utility.kivy_helper import *
-from utility.kivy_widgets import DebugLabel
 from utility.singleton import SingletonInstance
+from utility.kivy_widgets import DebugLabel
 
 from .game.level import LevelManager
 from .game.actor import ActorManager
@@ -23,11 +23,22 @@ from .game.game_controller import GameController
 from .game.game_resource import GameResourceManager
 
 
-class KivyRPGApp(BaseApp, SingletonInstance):
-    app_name="Kivy RPG"
+class KivyRPGApp(BaseApp):
+    app_name = "Kivy RPG"
+    orientation = "landscape" # all, landscape, portrait
+    __instance = None
+    __initialized = False
     
+    def __new__(cls, *args, **kargs):
+        if cls.__instance is None: 
+            cls.__instance__ = super().__new__(cls)
+        return cls.__instance__
+        
     def __init__(self):
-        super(KivyRPGApp, self).__init__(orientation="landscape")
+        if KivyRPGApp.__initialized:
+            return
+            
+        super().__init__()
         game_path = os.path.split(__file__)[0]
         self.resource_manager = GameResourceManager.instance(game_path)
         self.level_manager = LevelManager.instance(self)
@@ -35,6 +46,8 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.effect_manager = GameEffectManager.instance(self)
         self.game_controller = GameController.instance(self)
         self.debug_label = None
+        
+        KivyRPGApp.__initialized = True
         
     def initialize(self):
         self.resource_manager.initialize()
@@ -78,6 +91,3 @@ class KivyRPGApp(BaseApp, SingletonInstance):
         self.actor_manager.update(dt)
         self.level_manager.update(dt)
         
-
-def main(*args, **kargs):
-    return KivyRPGApp.instance(*args, **kargs)
