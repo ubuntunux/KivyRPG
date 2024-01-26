@@ -31,9 +31,14 @@ class KivyRPGApp(BaseApp):
     
     def __new__(cls, *args, **kargs):
         if cls.__instance is None: 
-            cls.__instance__ = super().__new__(cls)
-        return cls.__instance__
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
         
+    @classmethod
+    def __clear_instance__(cls):
+        cls.__instance = None
+        cls.__initialized = False
+    
     def __init__(self):
         if KivyRPGApp.__initialized:
             return
@@ -60,7 +65,7 @@ class KivyRPGApp(BaseApp):
         self.level_manager.open_level("default")
         
     def on_stop(self):
-        pass
+        self.__clear_instance__()
         
     def on_resize(self, window, width, height):
         pass
