@@ -26,23 +26,9 @@ from .game.game_resource import GameResourceManager
 class KivyRPGApp(BaseApp):
     app_name = "Kivy RPG"
     orientation = "landscape" # all, landscape, portrait
-    __instance = None
-    __initialized = False
-    
-    def __new__(cls, *args, **kargs):
-        if cls.__instance is None: 
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
-        
-    @classmethod
-    def __clear_instance__(cls):
-        cls.__instance = None
-        cls.__initialized = False
-    
+    allow_multiple_instance = False
+
     def __init__(self):
-        if KivyRPGApp.__initialized:
-            return
-            
         super().__init__()
         game_path = os.path.split(__file__)[0]
         self.resource_manager = GameResourceManager.instance(game_path)
@@ -51,8 +37,6 @@ class KivyRPGApp(BaseApp):
         self.effect_manager = GameEffectManager.instance(self)
         self.game_controller = GameController.instance(self)
         self.debug_label = None
-        
-        KivyRPGApp.__initialized = True
         
     def initialize(self):
         self.resource_manager.initialize()
@@ -65,7 +49,7 @@ class KivyRPGApp(BaseApp):
         self.level_manager.open_level("default")
         
     def on_stop(self):
-        self.__clear_instance__()
+        pass
         
     def on_resize(self, window, width, height):
         pass
