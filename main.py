@@ -38,22 +38,6 @@ class KivyRPGApp(BaseApp):
         self.game_controller = GameController.instance(self)
         self.debug_label = None
         
-    def initialize(self):
-        self.resource_manager.initialize()
-        self.level_manager.initialize(self, self.actor_manager, self.effect_manager)
-        self.actor_manager.initialize(self.level_manager, self.level_manager.get_character_layout())
-        self.effect_manager.initialize(self.level_manager, self.level_manager.get_effect_layout())
-        self.game_controller.initialize(self, self.level_manager, self.actor_manager)
-        self.build()
-        
-        self.level_manager.open_level("default")
-        
-    def on_stop(self):
-        pass
-        
-    def on_resize(self, window, width, height):
-        pass
-        
     def build(self):
         self.debug_label = DebugLabel(
             pos=(0, Window.height),
@@ -72,7 +56,26 @@ class KivyRPGApp(BaseApp):
             text = str(text)
         self.debug_label.debug_print(text)
         
-    def update(self, dt):
+    def on_initialize(self):
+        self.resource_manager.initialize()
+        self.level_manager.initialize(self, self.actor_manager, self.effect_manager)
+        self.actor_manager.initialize(self.level_manager, self.level_manager.get_character_layout())
+        self.effect_manager.initialize(self.level_manager, self.level_manager.get_effect_layout())
+        self.game_controller.initialize(self, self.level_manager, self.actor_manager)
+        self.build()
+        
+        self.level_manager.open_level("default")
+        
+    def on_stop(self):
+        pass
+        
+    def on_back(self):
+        pass
+        
+    def on_resize(self, window, width, height):
+        pass
+        
+    def on_update(self, dt):
         self.debug_label.update(dt)
         self.debug_label.pos = (0, Window.height - self.debug_label.height)
         self.game_controller.update(dt)
